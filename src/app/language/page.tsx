@@ -26,7 +26,7 @@ export default function LanguageScreen() {
 
   const handleSelect = (code: Lang) => {
     setLang(code);
-    router.push('/');
+    router.push('/garden');
   };
 
   return (

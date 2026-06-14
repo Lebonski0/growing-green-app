@@ -92,7 +92,7 @@ export default function PlantDetailScreen() {
             {t(lang, 'sessionExpired')}
           </p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/garden')}
             style={{
               background: '#37613A', color: 'white',
               fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, fontSize: '14px',

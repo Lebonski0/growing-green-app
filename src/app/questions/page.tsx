@@ -239,7 +239,7 @@ export default function QuestionsScreen() {
 
   const handlePrev = () => {
     if (currentStep > 0) setCurrentStep((s) => s - 1);
-    else router.push('/');
+    else router.push('/garden');
   };
 
   // Whether the question has 6 options (climate) — use compact card style
