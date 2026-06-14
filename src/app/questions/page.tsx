@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useLang } from '@/components/LangContext';
-import { t } from '@/lib/translations';
+import { t, TranslationKey } from '@/lib/translations';
 
 const getOptionImage = (label: string) => {
   const map: Record<string, string> = {
@@ -33,7 +33,15 @@ const getOptionImage = (label: string) => {
 };
 
 // Question IDs — options are looked up via translation keys
-const QUESTION_DEFS = [
+type QuestionDef = {
+  id: string;
+  titleKey: TranslationKey;
+  optionKeys: readonly TranslationKey[];
+  gridCols: number;
+  isMulti?: boolean;
+};
+
+const QUESTION_DEFS: QuestionDef[] = [
   {
     id: 'gardenType',
     titleKey: 'q1Title' as const,
@@ -64,6 +72,20 @@ const QUESTION_DEFS = [
     optionKeys: ['soilYes', 'soilNo'] as const,
     gridCols: 2,
   },
+  {
+    id: 'surroundings',
+    titleKey: 'q6Title' as const,
+    optionKeys: ['surroundingsForest', 'surroundingsCoastal', 'surroundingsPlains', 'surroundingsUrban'] as const,
+    gridCols: 2,
+    isMulti: true,
+  },
+  {
+    id: 'challenges',
+    titleKey: 'q7Title' as const,
+    optionKeys: ['challengeRocky', 'challengeRoots', 'challengeWinds', 'challengeWildlife', 'challengeDrainage', 'challengeNone'] as const,
+    gridCols: 2,
+    isMulti: true,
+  },
 ];
 
 // English option labels used as stable keys for image lookup and sessionStorage
@@ -88,6 +110,16 @@ const EN_OPTIONS: Record<string, string> = {
   large: 'Large – 100m² and above',
   soilYes: 'Yes – I have test results',
   soilNo: 'No – Use regional defaults',
+  surroundingsForest: 'Forest / Wooded',
+  surroundingsCoastal: 'Coastal / Near Sea',
+  surroundingsPlains: 'Open Plains / Grassland',
+  surroundingsUrban: 'Urban / City Center',
+  challengeRocky: 'Very Rocky Ground',
+  challengeRoots: 'Lots of Tree Roots',
+  challengeWinds: 'Strong Winds',
+  challengeWildlife: 'Wildlife (Deer, Rabbits)',
+  challengeDrainage: 'Poor Drainage / Puddles',
+  challengeNone: 'No specific challenges',
 };
 
 const QUICK_TAGS: Record<string, string[]> = {
@@ -105,6 +137,8 @@ type Answers = {
   sunExposure: string;
   plotSize: string;
   soilTest: string | null;
+  surroundings: string[];
+  challenges: string[];
 };
 
 export default function QuestionsScreen() {
@@ -117,6 +151,8 @@ export default function QuestionsScreen() {
     sunExposure: '',
     plotSize: '',
     soilTest: null,
+    surroundings: [],
+    challenges: [],
   });
   const [soilDetails, setSoilDetails] = useState('');
   const [animating, setAnimating] = useState(false);
@@ -130,17 +166,22 @@ export default function QuestionsScreen() {
   }));
   const isLast = currentStep === QUESTION_DEFS.length - 1;
 
-  const currentAnswer = (): string | null => {
+  const currentAnswer = (): string | string[] | null => {
     if (qDef.id === 'soilTest') return answers.soilTest;
-    return answers[qDef.id as keyof Answers] as string;
+    return answers[qDef.id as keyof Answers] as string | string[] | null;
   };
 
   const isAnswered = (): boolean => {
     const val = currentAnswer();
+    if (Array.isArray(val)) return val.length > 0;
     return val !== '' && val !== null;
   };
 
-  const isSelected = (label: string): boolean => currentAnswer() === label;
+  const isSelected = (label: string): boolean => {
+    const val = currentAnswer();
+    if (Array.isArray(val)) return val.includes(label);
+    return val === label;
+  };
 
   const advanceStep = useCallback(() => {
     if (animating) return;
@@ -152,20 +193,41 @@ export default function QuestionsScreen() {
   }, [animating]);
 
   const handleSelect = useCallback((enValue: string) => {
-    // Store the stable English value for API usage
+    if (qDef.isMulti) {
+      // Multi-select logic for challenges
+      setAnswers((prev) => {
+        const currentArr = prev[qDef.id as keyof Answers] as string[];
+        // If they click 'None', clear others and select 'None'
+        if (enValue === 'No specific challenges') {
+          return { ...prev, [qDef.id]: [enValue] };
+        }
+        // If they click a normal challenge, remove 'None' if it's there
+        let newArr = currentArr.filter(c => c !== 'No specific challenges');
+        
+        if (newArr.includes(enValue)) {
+          newArr = newArr.filter(c => c !== enValue);
+        } else {
+          newArr.push(enValue);
+        }
+        return { ...prev, [qDef.id]: newArr };
+      });
+      return; // Do not auto-advance for multi-select
+    }
+
+    // Single select logic
     const newAnswers = qDef.id === 'soilTest'
       ? { ...answers, soilTest: enValue }
       : { ...answers, [qDef.id]: enValue };
     setAnswers(newAnswers);
 
-    // Auto-advance — stay on soil test if 'Yes' selected (user needs to type)
+    // Auto-advance
     if (!isLast) {
       if (qDef.id === 'soilTest' && enValue === 'Yes – I have test results') {
         return;
       }
       setTimeout(() => advanceStep(), 180);
     }
-  }, [answers, qDef.id, isLast, advanceStep]);
+  }, [answers, qDef, isLast, advanceStep]);
 
   const handleComplete = () => {
     if (isAnswered()) {
@@ -316,7 +378,7 @@ export default function QuestionsScreen() {
                     boxShadow: selected ? '0 2px 12px rgba(55,97,58,0.2)' : '0 1px 4px rgba(0,0,0,0.06)',
                   }}
                 >
-                  {/* Option image — always uses English key for image lookup */}
+                  {/* Option image — only render if src exists */}
                   <div style={{
                     width: '100%',
                     aspectRatio: isCompact ? '4/3' : '16/9',
@@ -326,13 +388,16 @@ export default function QuestionsScreen() {
                     overflow: 'hidden',
                     position: 'relative',
                     flexShrink: 0,
+                    display: getOptionImage(opt.enValue) ? 'block' : 'none'
                   }}>
-                    <Image
-                      src={getOptionImage(opt.enValue)}
-                      alt={opt.label}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
+                    {getOptionImage(opt.enValue) && (
+                      <Image
+                        src={getOptionImage(opt.enValue)}
+                        alt={opt.label}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    )}
                   </div>
                   {/* Translated label */}
                   <span style={{
@@ -409,15 +474,15 @@ export default function QuestionsScreen() {
           )}
         </div>
 
-        {/* ── BOTTOM — Complete button (last step) or empty spacer ── */}
-        {isLast && (
-          <div style={{
-            flexShrink: 0,
-            padding: '12px 24px 32px',
-            borderTop: '1px solid rgba(255,255,255,0.25)',
-            display: 'flex',
-            justifyContent: 'center',
-          }}>
+        {/* ── BOTTOM — Complete or Next button ── */}
+        <div style={{
+          flexShrink: 0,
+          padding: '12px 24px 32px',
+          borderTop: '1px solid rgba(255,255,255,0.25)',
+          display: 'flex',
+          justifyContent: 'center',
+        }}>
+          {isLast ? (
             <button
               onClick={handleComplete}
               disabled={!isAnswered()}
@@ -439,8 +504,30 @@ export default function QuestionsScreen() {
             >
               {t(lang, 'complete')}
             </button>
-          </div>
-        )}
+          ) : (qDef.isMulti || (qDef.id === 'soilTest' && currentAnswer() === 'Yes – I have test results')) && (
+            <button
+              onClick={advanceStep}
+              disabled={!isAnswered()}
+              style={{
+                background: isAnswered() ? '#37613A' : 'rgba(5,33,7,0.15)',
+                color: isAnswered() ? 'white' : 'rgba(5,33,7,0.4)',
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 700,
+                fontSize: '15px',
+                borderRadius: '9999px',
+                padding: '14px 48px',
+                border: 'none',
+                cursor: isAnswered() ? 'pointer' : 'not-allowed',
+                minHeight: '52px',
+                transition: 'all 0.2s ease',
+                width: '100%',
+                maxWidth: '280px',
+              }}
+            >
+              Next
+            </button>
+          )}
+        </div>
       </div>
     </>
   );

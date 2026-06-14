@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     
-    const { gardenType, climateZone, sunExposure, plotSize, soilTest, lang = 'en' } = body;
+    const { gardenType, climateZone, sunExposure, plotSize, soilTest, soilDetails, surroundings, challenges, lang = 'en' } = body;
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
@@ -71,14 +71,6 @@ Output JSON format exactly like this:
   }
 }`;
 
-    const userPrompt = `
-User Context:
-Garden Type: ${gardenType}
-Climate Zone: ${climateZone}
-Sun Exposure: ${sunExposure}
-Plot Size: ${plotSize}
-Soil Test Results: ${soilTest || 'None provided'}
-    `;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 24000); // 24s timeout
@@ -95,7 +87,11 @@ Soil Test Results: ${soilTest || 'None provided'}
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: `Suggest plants for a ${gardenType} in a ${climateZone} climate. 
+Sun: ${sunExposure}. Size: ${plotSize}. 
+Soil: ${soilTest === 'Yes – I have test results' ? soilDetails : soilTest || "Unknown/Regional Default"}.
+Surroundings/Micro-climate: ${Array.isArray(surroundings) ? surroundings.join(", ") : surroundings || "Unknown"}.
+Specific Challenges: ${challenges && challenges.length > 0 ? challenges.join(", ") : "None"}.` }
         ]
       }),
       signal: controller.signal
@@ -148,88 +144,10 @@ Soil Test Results: ${soilTest || 'None provided'}
 
   } catch (error) {
     console.error("API Error in /recommend:", error);
-    
-    // Fallback data
-    const fallbackData = {
-      plants: [
-        {
-          id: "lavender",
-          name: "Lavender",
-          scientificName: "Lavandula angustifolia",
-          description: "A hardy, aromatic herb that thrives in full sun and well-drained soil. Perfect for your climate.",
-          bestPractices: [
-            "Water deeply but infrequently to encourage strong root growth.",
-            "Ensure proper drainage to prevent root rot.",
-            "Prune dead foliage in late winter before new growth starts."
-          ],
-          whenToPlant: "Spring or early Fall",
-          howToStart: "Transplant",
-          careLevel: "Easy",
-          tags: ["Drought Tolerant", "Pollinator"],
-          imageQuery: "lavender field purple",
-          imageUrl: encodeURI("/images/screens/Pollinator Garden.jpg")
-        },
-        {
-          id: "rosemary",
-          name: "Rosemary",
-          scientificName: "Salvia rosmarinus",
-          description: "Fragrant and pollinator-friendly evergreen shrub.",
-          bestPractices: ["Avoid overwatering", "Plant in full sun", "Prune lightly in spring"],
-          whenToPlant: "Spring",
-          howToStart: "Transplant or cuttings",
-          careLevel: "Easy",
-          tags: ["Full Sun", "Aromatic"],
-          imageQuery: "rosemary bush",
-          imageUrl: encodeURI("/images/screens/Vegetable Plot.jpg")
-        },
-        {
-          id: "thyme",
-          name: "Thyme",
-          scientificName: "Thymus vulgaris",
-          description: "Excellent ground cover that smells wonderful.",
-          bestPractices: ["Ensure good drainage", "Trim after flowering", "Do not fertilize heavily"],
-          whenToPlant: "Spring",
-          howToStart: "Direct seed or transplant",
-          careLevel: "Easy",
-          tags: ["Edible", "Hardy"],
-          imageQuery: "thyme herb",
-          imageUrl: encodeURI("/images/screens/Continental.jpg")
-        },
-        {
-          id: "sage",
-          name: "Sage",
-          scientificName: "Salvia officinalis",
-          description: "Drought resistant herb with beautiful velvety leaves.",
-          bestPractices: ["Requires good air circulation", "Replace every 3-4 years", "Harvest leaves before blooming"],
-          whenToPlant: "Spring or Fall",
-          howToStart: "Transplant",
-          careLevel: "Medium",
-          tags: ["Low Water", "Edible"],
-          imageQuery: "sage plant leaves",
-          imageUrl: encodeURI("/images/screens/Temperate.jpg")
-        },
-        {
-          id: "oregano",
-          name: "Oregano",
-          scientificName: "Origanum vulgare",
-          description: "Spreads easily and is great for cooking.",
-          bestPractices: ["Cut back regularly to encourage bushy growth", "Thrives in poorer soils", "Divide every few years"],
-          whenToPlant: "Spring",
-          howToStart: "Direct seed or cuttings",
-          careLevel: "Easy",
-          tags: ["Edible", "Perennial"],
-          imageQuery: "oregano herb garden",
-          imageUrl: encodeURI("/images/screens/Mediterranean.jpg")
-        }
-      ],
-      partner: {
-        name: "Local Seed Library",
-        location: "Check your local library or community center for seed swaps.",
-        imageQuery: "community garden",
-        imageUrl: encodeURI("/images/screens/Lawn Replacemen.jpg")
-      }
-    };
-
-    return NextResponse.json(fallbackData);
+    const message = error instanceof Error ? error.message : "An unexpected error occurred while generating your garden plan.";
+    return NextResponse.json(
+      { error: message }, 
+      { status: 500 }
+    );
   }
 }
