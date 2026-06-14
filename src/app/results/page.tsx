@@ -142,7 +142,7 @@ export default function ResultsScreen() {
         sessionStorage.removeItem('greenGardenAnswers');
       }, 500);
       
-    } catch (err) {
+    } catch {
       setEmailErrorMsg('Network error. Please check your connection and try again.');
       setEmailState('error');
     }

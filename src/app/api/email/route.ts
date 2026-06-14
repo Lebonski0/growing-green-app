@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const otherPlantsHtml = otherPlants.length > 0
       ? `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 22px; margin-bottom: 16px; border-bottom: 2px solid #D3DED5; padding-bottom: 8px;">Also Consider</h2>
          <div style="gap: 12px; margin-bottom: 32px;">
-           ${otherPlants.map((p: any) => {
+           ${otherPlants.map((p: { name: string; tags?: string[]; whenToPlant?: string }) => {
              const tagBadge = p.tags?.[0] ? `<span style="background: #D3DED5; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-right: 8px;">${p.tags[0]}</span>` : '';
              const whenHtml = p.whenToPlant ? `Plant in ${p.whenToPlant}` : '';
              return `<div style="background: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
@@ -133,7 +133,8 @@ export async function POST(req: Request) {
     if (response.error) {
       console.error('Resend Error:', response.error);
       // Parse Resend-specific errors into user-friendly messages
-      const code = (response.error as any)?.statusCode || (response.error as any)?.status;
+      const errorObj = response.error as unknown as { statusCode?: number, status?: number };
+      const code = errorObj?.statusCode || errorObj?.status;
       if (code === 403 || code === 422) {
         return NextResponse.json(
           { error: 'During the hackathon, emails can only be sent to the verified address (oskarcoding1@gmail.com). Please use that address.' },
@@ -147,10 +148,11 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email API Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to send email. Please try again.';
     return NextResponse.json(
-      { error: error.message || 'Failed to send email. Please try again.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
