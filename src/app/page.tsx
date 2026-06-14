@@ -66,8 +66,8 @@ export default function LandingPage() {
           </Link>
           
           <nav className="flex items-center gap-4 md:gap-10">
-            <a href="#the-magic" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>The Magic</a>
-            <a href="#the-promise" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>The Promise</a>
+            <a href="#the-magic" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{t(lang, 'lp_howItWorks')}</a>
+            <a href="#the-promise" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{t(lang, 'lp_promiseTitle')}</a>
             
             {/* Symmetrical Language Dropdown (Universality) */}
             <div className="relative nav-dropdown py-4 cursor-pointer group">
@@ -101,7 +101,7 @@ export default function LandingPage() {
             <Link href="/garden" 
                   className="bg-[#FFFFFF] text-[#052107] px-6 py-2.5 rounded-full text-[13px] font-bold hover:scale-[1.03] transition-transform duration-200" 
                   style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', minHeight: '44px', display: 'flex', alignItems: 'center' }}>
-              Get Started
+              {t(lang, 'getStarted')}
             </Link>
           </nav>
         </div>
@@ -132,18 +132,18 @@ export default function LandingPage() {
           
           <h1 className="text-[#F5F5F0] mb-6 leading-[1.05] drop-shadow-2xl" 
               style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(40px, 11vw, 84px)', fontWeight: 700 }}>
-            Your garden,<br />grown right.
+            {t(lang, 'lp_heroTitle1')}<br />{t(lang, 'lp_heroTitle2')}
           </h1>
           
           <p className="text-[18px] md:text-[20px] text-[#F5F5F0]/90 max-w-[540px] mb-10 leading-[1.6] drop-shadow-lg" 
              style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-            An AI plant plan made for your climate, soil, and space. Free, private, and effortlessly tailored to you.
+            {t(lang, 'lp_heroSub')}
           </p>
           
           <Link href="/garden" 
                 className="bg-[#FFFFFF] text-[#052107] text-[16px] rounded-full hover:scale-[1.03] transition-transform duration-200 ease-out flex items-center justify-center"
                 style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '0 48px', minHeight: '56px', boxShadow: '0 8px 32px rgba(255,255,255,0.15)' }}>
-            Get Started
+            {t(lang, 'getStarted')}
           </Link>
           
           <p className="mt-[20px] text-[12px] text-[#CAF5A6]/90 flex items-center gap-2 bg-[#052107]/60 px-4 py-2 rounded-full backdrop-blur-md border border-white/10" 
