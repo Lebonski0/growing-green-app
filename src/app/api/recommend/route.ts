@@ -127,7 +127,7 @@ Soil Test Results: ${soilTest || 'None provided'}
     }
 
     // Fetch images from Pixabay
-    await Promise.all(parsedJson.plants.map(async (plant: any) => {
+    await Promise.all(parsedJson.plants.map(async (plant: { name: string; scientificName?: string; imageUrl?: string }) => {
       let img = await fetchImage(plant.name);
       if (!img && plant.scientificName) {
          img = await fetchImage(plant.scientificName);

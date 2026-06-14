@@ -127,10 +127,9 @@ export async function POST(req: Request) {
 </html>`;
 
     const response = await resend.emails.send({
-      from: 'Green Garden <onboarding@resend.dev>',
-      to: 'oskarcoding1@gmail.com',   // verified address — Resend free tier requirement
-      replyTo: trimmedEmail,           // user's email goes here so you can reply to them
-      subject: `🌱 Green Garden Plan — requested by ${trimmedEmail}`,
+      from: 'Green Garden <hello@examiqo.com>',
+      to: trimmedEmail,
+      subject: `🌱 Your Green Garden Plan`,
       html: htmlContent,
     });
 
