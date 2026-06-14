@@ -1,18 +1,16 @@
 import { NextResponse } from 'next/server';
 
-async function fetchWikimediaImage(query: string): Promise<string | null> {
+async function fetchImage(query: string): Promise<string | null> {
+  const apiKey = process.env.PIXABAY_API_KEY;
+  if (!apiKey) return null;
   try {
-    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=800`, { signal: AbortSignal.timeout(3000) });
+    const res = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=3`, { signal: AbortSignal.timeout(3000) });
     const data = await res.json();
-    const pages = data.query?.pages;
-    if (pages) {
-      const pageId = Object.keys(pages)[0];
-      if (pageId !== '-1' && pages[pageId].thumbnail?.source) {
-        return pages[pageId].thumbnail.source;
-      }
+    if (data.hits && data.hits.length > 0) {
+      return data.hits[0].webformatURL;
     }
   } catch (e) {
-    console.error("Wikimedia fetch error for", query, e);
+    console.error("Pixabay fetch error for", query, e);
   }
   return null;
 }
@@ -87,7 +85,7 @@ Soil Test Results: ${soilTest || 'None provided'}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash", // Extremely cheap model via OpenRouter
+        model: "google/gemini-2.0-flash-001", // Switched to valid model ID
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
@@ -128,16 +126,16 @@ Soil Test Results: ${soilTest || 'None provided'}
       };
     }
 
-    // Fetch images from Wikimedia
+    // Fetch images from Pixabay
     await Promise.all(parsedJson.plants.map(async (plant: any) => {
-      let img = await fetchWikimediaImage(plant.scientificName || plant.name);
+      let img = await fetchImage(plant.name);
       if (!img && plant.scientificName) {
-         img = await fetchWikimediaImage(plant.name);
+         img = await fetchImage(plant.scientificName);
       }
-      plant.imageUrl = img || '/images/screens/Full Sun.jpg'; // fallback
+      plant.imageUrl = img || encodeURI('/images/screens/Full Sun.jpg'); // fallback
     }));
 
-    parsedJson.partner.imageUrl = '/images/screens/Lawn Replacemen.jpg';
+    parsedJson.partner.imageUrl = encodeURI('/images/screens/Lawn Replacemen.jpg');
 
     return NextResponse.json(parsedJson);
 
@@ -162,7 +160,7 @@ Soil Test Results: ${soilTest || 'None provided'}
           careLevel: "Easy",
           tags: ["Drought Tolerant", "Pollinator"],
           imageQuery: "lavender field purple",
-          imageUrl: "/images/screens/Pollinator Garden.jpg"
+          imageUrl: encodeURI("/images/screens/Pollinator Garden.jpg")
         },
         {
           id: "rosemary",
@@ -175,7 +173,7 @@ Soil Test Results: ${soilTest || 'None provided'}
           careLevel: "Easy",
           tags: ["Full Sun", "Aromatic"],
           imageQuery: "rosemary bush",
-          imageUrl: "/images/screens/Vegetable Plot.jpg"
+          imageUrl: encodeURI("/images/screens/Vegetable Plot.jpg")
         },
         {
           id: "thyme",
@@ -188,7 +186,7 @@ Soil Test Results: ${soilTest || 'None provided'}
           careLevel: "Easy",
           tags: ["Edible", "Hardy"],
           imageQuery: "thyme herb",
-          imageUrl: "/images/screens/Continental.jpg"
+          imageUrl: encodeURI("/images/screens/Continental.jpg")
         },
         {
           id: "sage",
@@ -201,7 +199,7 @@ Soil Test Results: ${soilTest || 'None provided'}
           careLevel: "Medium",
           tags: ["Low Water", "Edible"],
           imageQuery: "sage plant leaves",
-          imageUrl: "/images/screens/Temperate.jpg"
+          imageUrl: encodeURI("/images/screens/Temperate.jpg")
         },
         {
           id: "oregano",
@@ -214,14 +212,14 @@ Soil Test Results: ${soilTest || 'None provided'}
           careLevel: "Easy",
           tags: ["Edible", "Perennial"],
           imageQuery: "oregano herb garden",
-          imageUrl: "/images/screens/Mediterranean.jpg"
+          imageUrl: encodeURI("/images/screens/Mediterranean.jpg")
         }
       ],
       partner: {
         name: "Local Nursery Partner",
         location: "Check your nearest garden center",
         imageQuery: "garden nursery plants",
-        imageUrl: "/images/screens/Lawn Replacemen.jpg"
+        imageUrl: encodeURI("/images/screens/Lawn Replacemen.jpg")
       }
     };
 
