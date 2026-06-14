@@ -37,9 +37,28 @@ export default function LandingPage() {
       <link rel="canonical" href="https://growing-green-app.vercel.app" />
       <style dangerouslySetInnerHTML={{ __html: `html { scroll-behavior: smooth; }` }} />
       
+      {/* PROFESSIONAL NAVBAR */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#052107]/60 backdrop-blur-[16px] border-b border-[#CAF5A6]/10" style={{ WebkitBackdropFilter: 'blur(16px)' }}>
+        <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[20px]">🌱</span>
+            <span className="text-[#F5F5F0] text-[18px] font-bold tracking-wide" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+              Green Garden
+            </span>
+          </div>
+          
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#how-it-works" className="text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>How it works</a>
+            <a href="#features" className="text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>Standards</a>
+            <Link href="/garden" className="bg-[#37613A]/30 border border-[#37613A] text-[#CAF5A6] px-5 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#37613A]/50 transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              Launch App
+            </Link>
+          </nav>
+        </div>
+      </header>
+
       {/* SECTION 1 - Hero */}
-      {/* Added pb-24 to ensure the CTA never hits the bottom of the screen on small mobiles */}
-      <section className="relative min-h-[100dvh] pb-24 flex flex-col items-center justify-center text-center px-6 overflow-hidden"
+      <section className="relative w-full min-h-[100dvh] pt-[72px] pb-24 flex flex-col items-center justify-center text-center px-6 overflow-hidden"
         style={{ background: 'radial-gradient(ellipse at 30% 40%, #d4e84a 0%, #7bc96f 35%, #1a5c2a 70%, #052107 100%)' }}>
         <GrainTexture />
         
@@ -49,7 +68,7 @@ export default function LandingPage() {
           </span>
           
           <h1 className="text-[#F5F5F0] mb-6 leading-[1.1]" 
-              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 700 }}>
+              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(32px, 6vw, 64px)', fontWeight: 700 }}>
             Your garden,<br />grown right.
           </h1>
           
@@ -76,10 +95,9 @@ export default function LandingPage() {
       </section>
 
       {/* SECTION 2 - How it works */}
-      {/* flex-col md:flex-row handles stacking correctly on mobile */}
-      <section className="relative bg-[#052107] py-[80px] px-[24px] z-10">
-        <div className="max-w-[1000px] mx-auto">
-          <h2 className="mb-[64px] text-center uppercase tracking-[0.1em] text-[#CAF5A6] font-medium text-[11px]"
+      <section id="how-it-works" className="relative w-full bg-[#052107] py-[100px] px-[24px] z-10">
+        <div className="max-w-[1200px] mx-auto">
+          <h2 className="mb-[80px] text-center uppercase tracking-[0.1em] text-[#CAF5A6] font-medium text-[11px]"
               style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
             How it works
           </h2>
@@ -90,14 +108,13 @@ export default function LandingPage() {
               { num: '2', title: 'AI builds your plan', desc: 'Our AI recommends native plants that genuinely thrive in your exact conditions. When to plant. How to start.' },
               { num: '3', title: 'It lands in your inbox', desc: 'Your personalized plan is emailed to you. The moment it sends, we delete everything. Nothing stored.' }
             ].map((step, idx) => (
-              <div key={idx} className="flex-1 relative flex flex-col px-0 md:px-8 first:md:pl-0 last:md:pr-0">
+              <div key={idx} className="flex-1 relative flex flex-col px-0 md:px-12 first:md:pl-0 last:md:pr-0">
                 {/* Vertical line on desktop between steps */}
                 {idx !== 0 && (
                   <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-3/4 bg-[#37613A]"></div>
                 )}
                 
                 <div className="relative">
-                  {/* Numbers resized: 48px on mobile, 64px on desktop */}
                   <span className="absolute -top-[36px] md:-top-[40px] -left-[12px] md:-left-[16px] text-[48px] md:text-[64px] text-[#CAF5A6]/15 select-none"
                         style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
                     {step.num}
@@ -118,66 +135,66 @@ export default function LandingPage() {
       </section>
 
       {/* SECTION 3 - Judging criteria */}
-      <section className="relative bg-[#052107] py-[80px] px-[24px] z-10">
+      <section id="features" className="relative w-full bg-[#052107] py-[100px] px-[24px] z-10">
         <div className="absolute inset-0 bg-[#FFFFFF]/[0.03] pointer-events-none"></div>
-        <div className="relative max-w-[1000px] mx-auto z-10">
-          <h2 className="mb-[64px] text-center uppercase tracking-[0.1em] text-[#CAF5A6] font-medium text-[11px]"
+        <div className="relative max-w-[1200px] mx-auto z-10">
+          <h2 className="mb-[80px] text-center uppercase tracking-[0.1em] text-[#CAF5A6] font-medium text-[11px]"
               style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
             Built to the highest standard
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Card 1 */}
-            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-8 flex flex-col"
+            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-10 flex flex-col"
                  style={{ WebkitBackdropFilter: 'blur(16px)' }}>
               <div className="text-[#CAF5A6] mb-4"><ServerIcon /></div>
-              <h3 className="text-[#F5F5F0] text-[22px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Scales to 10,000+ users</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.7] mb-6 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Scales to 10,000+ users</h3>
+              <p className="text-[15px] text-[#F5F5F0]/60 leading-[1.7] mb-8 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 Stateless by design. No database, no bottleneck. Vercel Edge handles any load automatically.
               </p>
-              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[11px] font-medium px-3 py-1.5 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[12px] font-medium px-4 py-2 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 Serverless · Zero infrastructure
               </div>
             </div>
 
             {/* Card 2 */}
-            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-8 flex flex-col"
+            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-10 flex flex-col"
                  style={{ WebkitBackdropFilter: 'blur(16px)' }}>
               <div className="text-[#CAF5A6] mb-4"><GlobeIcon /></div>
-              <h3 className="text-[#F5F5F0] text-[22px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Works anywhere on earth</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.7] mb-6 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Works anywhere on earth</h3>
+              <p className="text-[15px] text-[#F5F5F0]/60 leading-[1.7] mb-8 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 6 climate zones covering every region. A rooftop garden in Bangkok or a plot in rural Belgium — the AI adapts.
               </p>
-              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[11px] font-medium px-3 py-1.5 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[12px] font-medium px-4 py-2 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 6 climate zones · No language barrier
               </div>
             </div>
 
             {/* Card 3 */}
-            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-8 flex flex-col"
+            <div className="bg-[#FFFFFF]/[0.12] backdrop-blur-[16px] border border-[#FFFFFF]/20 rounded-2xl p-10 flex flex-col"
                  style={{ WebkitBackdropFilter: 'blur(16px)' }}>
               <div className="text-[#CAF5A6] mb-4"><TapIcon /></div>
-              <h3 className="text-[#F5F5F0] text-[22px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Five taps. That&apos;s it.</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.7] mb-6 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Five taps. That&apos;s it.</h3>
+              <p className="text-[15px] text-[#F5F5F0]/60 leading-[1.7] mb-8 flex-1" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 No account. No form. No expertise needed. Visual choices only — a child and a grandparent can both use it.
               </p>
-              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[11px] font-medium px-3 py-1.5 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <div className="bg-[#37613A]/30 text-[#CAF5A6] text-[12px] font-medium px-4 py-2 rounded-full inline-flex self-start" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 Visual-only · No typing required
               </div>
             </div>
 
             {/* Card 4 - Equitable (Tiebreaker, Prominent) */}
-            <div className="bg-[#FFFFFF]/[0.16] backdrop-blur-[16px] border border-[#CAF5A6]/40 rounded-2xl p-8 flex flex-col relative overflow-hidden"
+            <div className="bg-[#FFFFFF]/[0.16] backdrop-blur-[16px] border border-[#CAF5A6]/40 rounded-2xl p-10 flex flex-col relative overflow-hidden"
                  style={{ boxShadow: '0 0 40px rgba(202,245,166,0.05)', WebkitBackdropFilter: 'blur(16px)' }}>
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+              <div className="absolute top-0 right-0 p-6 opacity-10">
                 <ShieldIcon />
               </div>
               <div className="text-[#CAF5A6] mb-4 relative z-10"><ShieldIcon /></div>
-              <h3 className="text-[#F5F5F0] text-[22px] mb-3 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>We take nothing back</h3>
-              <p className="text-[14px] text-[#F5F5F0]/80 leading-[1.7] mb-6 flex-1 relative z-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <h3 className="text-[#F5F5F0] text-[24px] mb-3 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>We take nothing back</h3>
+              <p className="text-[15px] text-[#F5F5F0]/80 leading-[1.7] mb-8 flex-1 relative z-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 Your plan is yours. No data sold, no profile built, no ads. We collect nothing. We store nothing. We give you everything.
               </p>
-              <div className="bg-[#CAF5A6]/20 text-[#CAF5A6] text-[11px] font-medium px-3 py-1.5 rounded-full inline-flex self-start relative z-10 border border-[#CAF5A6]/30" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              <div className="bg-[#CAF5A6]/20 text-[#CAF5A6] text-[12px] font-medium px-4 py-2 rounded-full inline-flex self-start relative z-10 border border-[#CAF5A6]/30" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 Zero data retention · Always free
               </div>
             </div>
@@ -186,22 +203,22 @@ export default function LandingPage() {
       </section>
 
       {/* SECTION 4 - Social proof */}
-      <section className="relative bg-[#052107] py-[60px] px-[24px] z-10 flex flex-col items-center text-center">
-        <div className="max-w-[600px] w-full">
-          <p className="text-[#CAF5A6] text-[28px] italic mb-6" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
+      <section className="relative w-full bg-[#052107] py-[80px] px-[24px] z-10 flex flex-col items-center text-center">
+        <div className="max-w-[800px] w-full">
+          <p className="text-[#CAF5A6] text-[32px] italic mb-6" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
             &quot;Think globally, build locally.&quot;
           </p>
-          <p className="text-[13px] text-[#F5F5F0]/50 mb-8" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', lineHeight: 1.6 }}>
+          <p className="text-[15px] text-[#F5F5F0]/50 mb-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', lineHeight: 1.6 }}>
             Built in 48 hours at the Hopamine Green Hackathon · June 2026<br/>
             For every gardener, in every climate, on every budget.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-4">
             {[
               '6 climate zones',
               '5-minute setup',
               'Zero data stored'
             ].map((badge, i) => (
-              <div key={i} className="rounded-full border border-[#CAF5A6]/30 text-[#CAF5A6] text-[11px] font-medium px-4 py-1.5"
+              <div key={i} className="rounded-full border border-[#CAF5A6]/30 text-[#CAF5A6] text-[13px] font-medium px-5 py-2"
                    style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 {badge}
               </div>
@@ -211,27 +228,27 @@ export default function LandingPage() {
       </section>
 
       {/* SECTION 5 - Final CTA */}
-      <section className="relative py-[100px] px-[24px] flex flex-col items-center text-center overflow-hidden"
+      <section className="relative w-full py-[120px] px-[24px] flex flex-col items-center text-center overflow-hidden"
         style={{ background: 'radial-gradient(ellipse at 30% 40%, #d4e84a 0%, #7bc96f 35%, #1a5c2a 70%, #052107 100%)' }}>
         <GrainTexture />
         
         <div className="relative z-10 flex flex-col items-center">
           <h2 className="text-[#F5F5F0] mb-4 leading-[1.1]" 
-              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700 }}>
+              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700 }}>
             Your garden is waiting.
           </h2>
           
-          <p className="text-[16px] text-[#F5F5F0]/70 mb-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+          <p className="text-[18px] text-[#F5F5F0]/70 mb-12" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
             Free. Private. Ready in 5 minutes.
           </p>
           
           <Link href="/garden" 
                 className="bg-[#FFFFFF] text-[#052107] text-[14px] rounded-full hover:scale-[1.03] transition-transform duration-200 ease-out flex items-center justify-center"
-                style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '16px 40px', minHeight: '44px', boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
+                style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '16px 48px', minHeight: '44px', boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
             Get my free garden plan
           </Link>
           
-          <p className="mt-[48px] text-[10px] text-[#CAF5A6]/40" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+          <p className="mt-[64px] text-[12px] text-[#CAF5A6]/40" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
             Green Garden · Hopamine Green Hackathon 2026 · Think Globally, Build Locally
           </p>
         </div>

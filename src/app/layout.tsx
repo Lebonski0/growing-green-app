@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "@/components/LangContext";
+import ClientShell from "@/components/ClientShell";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,12 +54,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${dmSerifDisplay.variable} antialiased font-body`}>
         <LangProvider>
-          {/* Desktop shell — centers the mobile app with a botanical background on large screens */}
-          <div className="desktop-shell">
-            <div className="app-container">
-              {children}
-            </div>
-          </div>
+          <ClientShell>
+            {children}
+          </ClientShell>
         </LangProvider>
       </body>
     </html>
