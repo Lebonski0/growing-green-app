@@ -3,6 +3,8 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useLang } from '@/components/LangContext';
+import { t } from '@/lib/translations';
 
 const getOptionImage = (label: string) => {
   const map: Record<string, string> = {
@@ -30,38 +32,63 @@ const getOptionImage = (label: string) => {
   return map[label] || '';
 };
 
-const QUESTIONS = [
+// Question IDs — options are looked up via translation keys
+const QUESTION_DEFS = [
   {
     id: 'gardenType',
-    title: 'What type of garden do you want?',
-    options: ['Food Forest', 'Pollinator Garden', 'Vegetable Plot', 'Lawn Replacement'],
+    titleKey: 'q1Title' as const,
+    optionKeys: ['foodForest', 'pollinatorGarden', 'vegetablePlot', 'lawnReplacement'] as const,
     gridCols: 2,
   },
   {
     id: 'climateZone',
-    title: 'Where in the world are you growing?',
-    options: ['Tropical', 'Arid / Desert', 'Mediterranean', 'Temperate', 'Continental', 'Subtropical'],
-    gridCols: 3, // 3 columns for 6 items — no scroll needed
+    titleKey: 'q2Title' as const,
+    optionKeys: ['tropical', 'aridDesert', 'mediterranean', 'temperate', 'continental', 'subtropical'] as const,
+    gridCols: 3,
   },
   {
     id: 'sunExposure',
-    title: 'How much sun does your space get?',
-    options: ['Full Sun (6+ hours)', 'Partial Sun (3–6 hours)', 'Partial Shade (1–3 hours)', 'Full Shade (less than 1 hour)'],
+    titleKey: 'q3Title' as const,
+    optionKeys: ['fullSun', 'partialSun', 'partialShade', 'fullShade'] as const,
     gridCols: 2,
   },
   {
     id: 'plotSize',
-    title: 'How big is your growing space?',
-    options: ['Tiny – Balcony / Container', 'Small – Up to 25m²', 'Medium – 25 to 100m²', 'Large – 100m² and above'],
+    titleKey: 'q4Title' as const,
+    optionKeys: ['tiny', 'small', 'medium', 'large'] as const,
     gridCols: 2,
   },
   {
     id: 'soilTest',
-    title: 'Do you have soil test results?',
-    options: ['Yes – I have test results', 'No – Use regional defaults'],
+    titleKey: 'q5Title' as const,
+    optionKeys: ['soilYes', 'soilNo'] as const,
     gridCols: 2,
   },
 ];
+
+// English option labels used as stable keys for image lookup and sessionStorage
+const EN_OPTIONS: Record<string, string> = {
+  foodForest: 'Food Forest',
+  pollinatorGarden: 'Pollinator Garden',
+  vegetablePlot: 'Vegetable Plot',
+  lawnReplacement: 'Lawn Replacement',
+  tropical: 'Tropical',
+  aridDesert: 'Arid / Desert',
+  mediterranean: 'Mediterranean',
+  temperate: 'Temperate',
+  continental: 'Continental',
+  subtropical: 'Subtropical',
+  fullSun: 'Full Sun (6+ hours)',
+  partialSun: 'Partial Sun (3–6 hours)',
+  partialShade: 'Partial Shade (1–3 hours)',
+  fullShade: 'Full Shade (less than 1 hour)',
+  tiny: 'Tiny – Balcony / Container',
+  small: 'Small – Up to 25m²',
+  medium: 'Medium – 25 to 100m²',
+  large: 'Large – 100m² and above',
+  soilYes: 'Yes – I have test results',
+  soilNo: 'No – Use regional defaults',
+};
 
 type Answers = {
   gardenType: string;
@@ -73,6 +100,7 @@ type Answers = {
 
 export default function QuestionsScreen() {
   const router = useRouter();
+  const { lang } = useLang();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({
     gardenType: '',
@@ -84,12 +112,18 @@ export default function QuestionsScreen() {
   const [soilDetails, setSoilDetails] = useState('');
   const [animating, setAnimating] = useState(false);
 
-  const q = QUESTIONS[currentStep];
-  const isLast = currentStep === QUESTIONS.length - 1;
+  const qDef = QUESTION_DEFS[currentStep];
+  // Build translated options array
+  const qOptions = qDef.optionKeys.map(k => ({
+    key: k,
+    label: t(lang, k),      // translated display label
+    enValue: EN_OPTIONS[k], // stable English value for storage & image lookup
+  }));
+  const isLast = currentStep === QUESTION_DEFS.length - 1;
 
   const currentAnswer = (): string | null => {
-    if (q.id === 'soilTest') return answers.soilTest;
-    return answers[q.id as keyof Answers] as string;
+    if (qDef.id === 'soilTest') return answers.soilTest;
+    return answers[qDef.id as keyof Answers] as string;
   };
 
   const isAnswered = (): boolean => {
@@ -108,26 +142,26 @@ export default function QuestionsScreen() {
     }, 260);
   }, [animating]);
 
-  const handleSelect = useCallback((label: string) => {
-    // Update the answer first
-    const newAnswers = q.id === 'soilTest'
-      ? { ...answers, soilTest: label }
-      : { ...answers, [q.id]: label };
+  const handleSelect = useCallback((enValue: string) => {
+    // Store the stable English value for API usage
+    const newAnswers = qDef.id === 'soilTest'
+      ? { ...answers, soilTest: enValue }
+      : { ...answers, [qDef.id]: enValue };
     setAnswers(newAnswers);
 
-    // Auto-advance — but on soil test only if "No" (no text input needed)
+    // Auto-advance — stay on soil test if 'Yes' selected (user needs to type)
     if (!isLast) {
-      if (q.id === 'soilTest' && label === 'Yes – I have test results') {
-        // Stay — user needs to fill in soil details
+      if (qDef.id === 'soilTest' && enValue === 'Yes – I have test results') {
         return;
       }
-      setTimeout(() => advanceStep(), 180); // tiny delay so selection flash is visible
+      setTimeout(() => advanceStep(), 180);
     }
-  }, [answers, q.id, isLast, advanceStep]);
+  }, [answers, qDef.id, isLast, advanceStep]);
 
   const handleComplete = () => {
     if (isAnswered()) {
       sessionStorage.setItem('greenGardenAnswers', JSON.stringify({ ...answers, soilDetails: soilDetails || null }));
+      sessionStorage.removeItem('greenGardenResults'); // Force fresh API call
       router.push('/results');
     }
   };
@@ -138,7 +172,7 @@ export default function QuestionsScreen() {
   };
 
   // Whether the question has 6 options (climate) — use compact card style
-  const isCompact = q.options.length === 6;
+  const isCompact = qDef.optionKeys.length === 6;
 
   return (
     <>
@@ -194,7 +228,7 @@ export default function QuestionsScreen() {
 
           {/* Progress dots */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            {QUESTIONS.map((_, i) => (
+            {QUESTION_DEFS.map((_, i) => (
               <div
                 key={i}
                 style={{
@@ -232,7 +266,7 @@ export default function QuestionsScreen() {
             marginBottom: '4px',
             lineHeight: 1.2,
           }}>
-            {q.title}
+            {t(lang, qDef.titleKey)}
           </h1>
 
           {/* Subtle step label */}
@@ -242,21 +276,21 @@ export default function QuestionsScreen() {
             color: 'rgba(5,33,7,0.5)',
             marginBottom: isCompact ? '16px' : '20px',
           }}>
-            Question {currentStep + 1} of {QUESTIONS.length}
+            {t(lang, 'question')} {currentStep + 1} {t(lang, 'questionOf')} {QUESTION_DEFS.length}
           </p>
 
           {/* Options grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${q.gridCols}, 1fr)`,
+            gridTemplateColumns: `repeat(${qDef.gridCols}, 1fr)`,
             gap: isCompact ? '8px' : '12px',
           }}>
-            {q.options.map((opt) => {
-              const selected = isSelected(opt);
+            {qOptions.map((opt) => {
+              const selected = isSelected(opt.enValue);
               return (
                 <button
-                  key={opt}
-                  onClick={() => handleSelect(opt)}
+                  key={opt.key}
+                  onClick={() => handleSelect(opt.enValue)}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -273,7 +307,7 @@ export default function QuestionsScreen() {
                     boxShadow: selected ? '0 2px 12px rgba(55,97,58,0.2)' : '0 1px 4px rgba(0,0,0,0.06)',
                   }}
                 >
-                  {/* Option image */}
+                  {/* Option image — always uses English key for image lookup */}
                   <div style={{
                     width: '100%',
                     aspectRatio: isCompact ? '4/3' : '16/9',
@@ -285,13 +319,13 @@ export default function QuestionsScreen() {
                     flexShrink: 0,
                   }}>
                     <Image
-                      src={getOptionImage(opt)}
-                      alt={opt}
+                      src={getOptionImage(opt.enValue)}
+                      alt={opt.label}
                       fill
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
-                  {/* Label */}
+                  {/* Translated label */}
                   <span style={{
                     fontFamily: 'var(--font-inter), system-ui, sans-serif',
                     fontWeight: 700,
@@ -301,7 +335,7 @@ export default function QuestionsScreen() {
                     paddingBottom: '2px',
                     lineHeight: 1.3,
                   }}>
-                    {opt}
+                    {opt.label}
                   </span>
                 </button>
               );
@@ -309,7 +343,7 @@ export default function QuestionsScreen() {
           </div>
 
           {/* Soil test textarea — only shown when "Yes" is selected */}
-          {q.id === 'soilTest' && answers.soilTest === 'Yes – I have test results' && (
+          {qDef.id === 'soilTest' && answers.soilTest === 'Yes – I have test results' && (
             <div style={{ marginTop: '16px' }}>
               <label style={{
                 display: 'block',
@@ -319,12 +353,12 @@ export default function QuestionsScreen() {
                 color: '#052107',
                 marginBottom: '8px',
               }}>
-                Enter your test results (N-P-K, pH, etc.)
+                {t(lang, 'soilInputLabel')}
               </label>
               <textarea
                 value={soilDetails}
                 onChange={(e) => setSoilDetails(e.target.value)}
-                placeholder="e.g. pH 6.5, low nitrogen..."
+                placeholder={t(lang, 'soilInputPlaceholder')}
                 rows={3}
                 style={{
                   width: '100%',
@@ -371,7 +405,7 @@ export default function QuestionsScreen() {
                 maxWidth: '280px',
               }}
             >
-              Get My Garden Plan 🌱
+              {t(lang, 'complete')}
             </button>
           </div>
         )}

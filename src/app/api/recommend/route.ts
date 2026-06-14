@@ -4,7 +4,10 @@ async function fetchImage(query: string): Promise<string | null> {
   const apiKey = process.env.PIXABAY_API_KEY;
   if (!apiKey) return null;
   try {
-    const res = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=3`, { signal: AbortSignal.timeout(3000) });
+    const res = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=3`, { 
+      signal: AbortSignal.timeout(3000),
+      cache: 'no-store'
+    });
     const data = await res.json();
     if (data.hits && data.hits.length > 0) {
       return data.hits[0].webformatURL;
@@ -15,6 +18,7 @@ async function fetchImage(query: string): Promise<string | null> {
   return null;
 }
 
+export const dynamic = 'force-dynamic';
 export const maxDuration = 25; // Setup max duration for Vercel/Next.js if needed
 
 export async function POST(req: Request) {
@@ -84,6 +88,7 @@ Soil Test Results: ${soilTest || 'None provided'}
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
+      cache: 'no-store',
       body: JSON.stringify({
         model: "google/gemini-2.5-flash", // Reverting to the correct model name
         response_format: { type: "json_object" },
