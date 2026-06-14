@@ -1,0 +1,569 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+interface Plant {
+  id: string;
+  name: string;
+  scientificName?: string;
+  description: string;
+  bestPractices?: string[];
+  whenToPlant?: string;
+  howToStart?: string;
+  careLevel?: string;
+  tags: string[];
+  imageQuery?: string;
+}
+
+interface Partner {
+  name: string;
+  location: string;
+  imageQuery: string;
+}
+
+interface RecommendResponse {
+  plants: Plant[];
+  partner: Partner;
+}
+
+export default function ResultsScreen() {
+  const router = useRouter();
+  
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<RecommendResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Email states
+  const [email, setEmail] = useState('');
+  const [emailState, setEmailState] = useState<'default' | 'error' | 'sending' | 'success'>('default');
+  const [emailErrorMsg, setEmailErrorMsg] = useState('Please enter a valid email address');
+
+  // Loading text timer
+  const [loadingText, setLoadingText] = useState('Growing your plan...');
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading) {
+      timer = setTimeout(() => {
+        setLoadingText('Consulting our plant expert...');
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      // 1. Check if we already have results cached (e.g. came back from plant detail page)
+      const cachedResults = sessionStorage.getItem('greenGardenResults');
+      if (cachedResults) {
+        try {
+          const parsed = JSON.parse(cachedResults);
+          if (parsed?.plants?.length > 0) {
+            setData(parsed);
+            setLoading(false);
+            return; // Skip API call — use cached data
+          }
+        } catch {
+          // Cache is corrupt, fall through to API call
+          sessionStorage.removeItem('greenGardenResults');
+        }
+      }
+
+      // 2. No cache — fetch from API
+      const storedAnswers = sessionStorage.getItem('greenGardenAnswers');
+      const answers = storedAnswers ? JSON.parse(storedAnswers) : null;
+
+      try {
+        const res = await fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(answers),
+        });
+        
+        if (!res.ok) throw new Error('Failed to fetch recommendations');
+        
+        const result = await res.json();
+        setData(result);
+        sessionStorage.setItem('greenGardenResults', JSON.stringify(result));
+      } catch (err) {
+        console.error(err);
+        setError('Could not load recommendations. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  const handleEmailSubmit = async () => {
+    // Trim first — catches invisible whitespace / copy-paste artifacts
+    const trimmedEmail = email.trim();
+    
+    // Robust email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setEmailErrorMsg('Please enter a valid email address');
+      setEmailState('error');
+      return;
+    }
+
+    setEmailState('sending');
+
+    try {
+      const storedAnswers = sessionStorage.getItem('greenGardenAnswers');
+      const answers = storedAnswers ? JSON.parse(storedAnswers) : {};
+      
+      const res = await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: trimmedEmail,
+          plants: data?.plants || [],
+          partner: data?.partner || null,
+          answers
+        })
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        // Show the actual error from the server if available
+        const msg = json?.error || 'Failed to send email. Please try again.';
+        setEmailErrorMsg(msg);
+        setEmailState('error');
+        return;
+      }
+      
+      setEmailState('success');
+      setTimeout(() => {
+        sessionStorage.removeItem('greenGardenAnswers');
+      }, 500);
+      
+    } catch (err) {
+      setEmailErrorMsg('Network error. Please check your connection and try again.');
+      setEmailState('error');
+    }
+  };
+
+  // --- LOADING STATE ---
+  if (loading) {
+    return (
+      <>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundImage: "url('/assets/gradient-1.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 0,
+            animation: 'pulseBg 2s infinite ease-in-out',
+          }}
+        />
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes pulseBg {
+            0% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 0.7; transform: scale(1); }
+          }
+        `}} />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+          <div style={{ fontSize: '48px' }}>🌱</div>
+          <h2 style={{
+            fontFamily: 'var(--font-charon), Georgia, serif',
+            fontWeight: 400,
+            fontSize: '20px',
+            color: '#052107',
+          }}>
+            {loadingText}
+          </h2>
+        </div>
+      </>
+    );
+  }
+
+  // --- ERROR STATE ---
+  if (error || !data) {
+    return (
+      <>
+        <div style={{ position: 'fixed', inset: 0, backgroundImage: "url('/assets/gradient-1.png')", backgroundSize: 'cover', zIndex: 0 }} />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌿</div>
+          <h2 style={{ fontFamily: 'var(--font-charon), Georgia, serif', fontSize: '20px', color: '#052107', marginBottom: '12px' }}>
+            Something went wrong
+          </h2>
+          <p style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '14px', color: 'rgba(5,33,7,0.7)', marginBottom: '24px' }}>
+            {error || 'Could not load your recommendations.'}
+          </p>
+          <button
+            onClick={() => router.push('/questions')}
+            style={{
+              background: '#37613A',
+              color: 'white',
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
+              fontWeight: 700,
+              fontSize: '14px',
+              borderRadius: '9999px',
+              padding: '12px 32px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // --- RESULTS STATE ---
+  return (
+    <>
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundImage: "url('/assets/gradient-1.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          maxWidth: '430px',
+          margin: '0 auto',
+          zIndex: 2,
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '40px 20px 40px',
+            WebkitOverflowScrolling: 'touch', // Smooth iOS scrolling
+          }}
+          className="no-scrollbar"
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '24px' }}>
+            <Image src="/assets/Logo Dark.svg" alt="Leaf" width={16} height={16} style={{ marginTop: '2px', flexShrink: 0 }} />
+            <p style={{
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
+              fontWeight: 400,
+              fontSize: '14px',
+              color: '#052107',
+              lineHeight: 1.4,
+            }}>
+              Based on your input, here are our top recommendations for your green garden
+            </p>
+          </div>
+
+          {/* MAIN CARD */}
+          {data.plants.length > 0 && (
+            <button
+              onClick={() => router.push(`/plant/${data.plants[0].id}`)}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.75)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255,255,255,0.4)',
+                padding: '12px',
+                marginBottom: '20px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                display: 'block',
+              }}
+            >
+              {/* Image */}
+              <div style={{
+                width: '100%',
+                height: '160px',
+                background: '#D3DED5',
+                borderRadius: '12px',
+                marginBottom: '12px',
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
+                <Image 
+                  src={`https://source.unsplash.com/featured/800x400?${encodeURIComponent(data.plants[0].imageQuery || 'garden plant')}&sig=${data.plants[0].id}`} 
+                  alt={data.plants[0].name}
+                  fill 
+                  style={{ objectFit: 'cover' }} 
+                  unoptimized
+                />
+              </div>
+
+              {/* Tags */}
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                {data.plants[0].tags.slice(0, 2).map(tag => (
+                  <span key={tag} style={{
+                    background: '#D3DED5',
+                    color: '#052107',
+                    fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                    fontWeight: 400,
+                    fontSize: '10px',
+                    padding: '4px 10px',
+                    borderRadius: '9999px',
+                  }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <h3 style={{
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 700,
+                fontSize: '16px',
+                color: '#052107',
+                marginBottom: '4px',
+                textAlign: 'left',
+              }}>
+                {data.plants[0].name}
+              </h3>
+              <p style={{
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 400,
+                fontSize: '14px',
+                color: '#052107',
+                lineHeight: 1.4,
+                textAlign: 'left',
+              }}>
+                {data.plants[0].description}
+              </p>
+            </button>
+          )}
+
+          {/* 2x2 GRID */}
+          {data.plants.length > 1 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+              marginBottom: '32px',
+            }}>
+              {data.plants.slice(1, 5).map(plant => (
+                <button
+                  key={plant.id}
+                  onClick={() => router.push(`/plant/${plant.id}`)}
+                  style={{
+                    background: 'rgba(255,255,255,0.75)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    padding: '8px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <div style={{
+                    width: '100%',
+                    height: '100px',
+                    background: '#D3DED5',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    flexShrink: 0,
+                  }}>
+                    <Image 
+                      src={`https://source.unsplash.com/featured/400x300?${encodeURIComponent(plant.imageQuery || 'plant')}&sig=${plant.id}`} 
+                      alt={plant.name}
+                      fill 
+                      style={{ objectFit: 'cover' }} 
+                      unoptimized
+                    />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    {plant.tags.slice(0, 1).map(tag => (
+                      <span key={tag} style={{
+                        background: '#D3DED5',
+                        color: '#052107',
+                        fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                        fontWeight: 400,
+                        fontSize: '9px',
+                        padding: '2px 7px',
+                        borderRadius: '9999px',
+                      }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <h4 style={{
+                    fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    color: '#052107',
+                    marginBottom: '2px',
+                    textAlign: 'left',
+                  }}>
+                    {plant.name}
+                  </h4>
+                  <p style={{
+                    fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                    fontWeight: 400,
+                    fontSize: '11px',
+                    color: '#052107',
+                    lineHeight: 1.3,
+                    textAlign: 'left',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}>
+                    {plant.description}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* EMAIL SECTION */}
+          <div style={{ 
+            marginBottom: '20px',
+            background: 'rgba(255,255,255,0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.4)',
+            padding: '20px',
+          }}>
+            <h3 style={{
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
+              fontWeight: 700,
+              fontSize: '16px',
+              color: '#052107',
+              marginBottom: '4px',
+            }}>
+              Save your results
+            </h3>
+            <p style={{
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
+              fontWeight: 400,
+              fontSize: '12px',
+              color: '#052107',
+              marginBottom: '4px',
+              lineHeight: 1.4,
+            }}>
+              Send your personalized garden plan to your email
+            </p>
+            <p style={{
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
+              fontWeight: 400,
+              fontSize: '10px',
+              color: '#37613A',
+              marginBottom: '16px',
+            }}>
+              ⓘ For your privacy, Green Garden does not save data from your inputs
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailState === 'error') setEmailState('default');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleEmailSubmit();
+                }}
+                disabled={emailState === 'success' || emailState === 'sending'}
+                style={{
+                  flex: 1,
+                  background: (emailState === 'success' || emailState === 'sending') ? '#F5F5F5' : '#FFFFFF',
+                  borderRadius: '9999px',
+                  padding: '12px 16px',
+                  fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                  fontSize: '14px',
+                  border: emailState === 'error' ? '2px solid #BB1D42' : '1.5px solid rgba(211,222,213,0.8)',
+                  outline: 'none',
+                  minHeight: '44px',
+                  color: '#052107',
+                  boxSizing: 'border-box',
+                  minWidth: 0, // Prevent flex overflow
+                }}
+              />
+              <button
+                onClick={handleEmailSubmit}
+                disabled={emailState === 'success' || emailState === 'sending'}
+                style={{
+                  background: emailState === 'success' ? '#D3DED5' : '#37613A',
+                  color: emailState === 'success' ? 'rgba(5,33,7,0.5)' : '#FFFFFF',
+                  fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  borderRadius: '9999px',
+                  padding: '0 20px',
+                  border: 'none',
+                  minHeight: '44px',
+                  flexShrink: 0,
+                  cursor: (emailState === 'success' || emailState === 'sending') ? 'not-allowed' : 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {emailState === 'sending' ? '...' : 'Send'}
+              </button>
+            </div>
+            
+            {emailState === 'error' && (
+              <p style={{
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 400,
+                fontSize: '11px',
+                color: '#BB1D42',
+                marginTop: '8px',
+                paddingLeft: '12px',
+              }}>
+                {emailErrorMsg}
+              </p>
+            )}
+            {emailState === 'success' && (
+              <p style={{
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 400,
+                fontSize: '11px',
+                color: '#37613A',
+                marginTop: '8px',
+                paddingLeft: '12px',
+              }}>
+                ✓ Thank you! Expect an email shortly
+              </p>
+            )}
+            {emailState === 'sending' && (
+              <p style={{
+                fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                fontWeight: 400,
+                fontSize: '11px',
+                color: 'rgba(5,33,7,0.5)',
+                marginTop: '8px',
+                paddingLeft: '12px',
+              }}>
+                Sending your plan...
+              </p>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+}

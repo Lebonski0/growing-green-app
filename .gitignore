@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Design / Figma files (may contain embedded tokens or S3 URLs)
+figma.json
+check_figma.js
+afbeelding figma/
+greengarden assets/
