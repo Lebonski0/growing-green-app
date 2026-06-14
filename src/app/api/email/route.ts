@@ -31,6 +31,8 @@ export async function POST(req: Request) {
     const climateZone = answers?.climateZone || 'N/A';
     const sunExposure = answers?.sunExposure || 'N/A';
     const plotSize = answers?.plotSize || 'N/A';
+    // Include requester info at top of email
+    const requesterBanner = `<div style="background:#052107;color:#CAF5A6;padding:12px 32px;font-size:13px;text-align:center;">📬 Requested by: <strong>${trimmedEmail}</strong></div>`;
     const scientificNameHtml = mainPlant.scientificName
       ? `<p style="font-style: italic; color: #37613A; font-size: 14px; margin-top: 0;">${mainPlant.scientificName}</p>`
       : '';
@@ -75,6 +77,7 @@ export async function POST(req: Request) {
       <h1 style="font-family: Georgia, serif; color: #FFFFFF; margin: 0; font-size: 28px; font-weight: 700;">Green Garden 🌿</h1>
       <p style="color: #CAF5A6; font-size: 16px; margin-top: 8px; margin-bottom: 0;">Your personalized garden plan</p>
     </div>
+    ${requesterBanner}
 
     <div style="padding: 32px;">
       
@@ -125,8 +128,9 @@ export async function POST(req: Request) {
 
     const response = await resend.emails.send({
       from: 'Green Garden <onboarding@resend.dev>',
-      to: trimmedEmail,
-      subject: '🌱 Your Green Garden Plan is Ready',
+      to: 'oskarcoding1@gmail.com',   // verified address — Resend free tier requirement
+      replyTo: trimmedEmail,           // user's email goes here so you can reply to them
+      subject: `🌱 Green Garden Plan — requested by ${trimmedEmail}`,
       html: htmlContent,
     });
 
@@ -137,7 +141,7 @@ export async function POST(req: Request) {
       const code = errorObj?.statusCode || errorObj?.status;
       if (code === 403 || code === 422) {
         return NextResponse.json(
-          { error: 'During the hackathon, emails can only be sent to the verified address (oskarcoding1@gmail.com). Please use that address.' },
+          { error: 'Email service error. Please try again later.' },
           { status: 400 }
         );
       }
