@@ -85,7 +85,7 @@ Soil Test Results: ${soilTest || 'None provided'}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001", // Switched to valid model ID
+        model: "google/gemini-2.5-flash", // Reverting to the correct model name
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
@@ -109,7 +109,8 @@ Soil Test Results: ${soilTest || 'None provided'}
       throw new Error("No text returned from Gemini");
     }
 
-    const parsedJson = JSON.parse(rawText);
+    const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsedJson = JSON.parse(cleanText);
     
     // Validate: need at least 1 plant
     if (!parsedJson.plants || !Array.isArray(parsedJson.plants) || parsedJson.plants.length < 1) {
