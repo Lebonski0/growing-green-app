@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useLang } from '@/components/LangContext';
+import type { Lang } from '@/lib/translations';
 
 const GrainTexture = () => (
   <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden mix-blend-overlay">
@@ -29,9 +31,11 @@ const ChevronDown = () => (
 
 export default function LandingPage() {
   const router = useRouter();
+  const { lang, setLang } = useLang();
 
-  const handleLanguageSelect = (e: React.MouseEvent) => {
+  const handleLanguageSelect = (e: React.MouseEvent, selectedLangCode: Lang) => {
     e.preventDefault();
+    setLang(selectedLangCode);
     router.push('/garden'); // Routing back to garden flow after language selection
   };
 
@@ -71,23 +75,23 @@ export default function LandingPage() {
             {/* Symmetrical Language Dropdown (Universality) */}
             <div className="relative nav-dropdown py-4 cursor-pointer">
               <div className="flex items-center gap-1.5 text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                <GlobeIcon /> EN <ChevronDown />
+                <GlobeIcon /> {lang.toUpperCase()} <ChevronDown />
               </div>
               <div className="dropdown-menu absolute hidden right-0 top-[60px] bg-[#052107]/95 backdrop-blur-xl border border-[#CAF5A6]/20 rounded-xl overflow-hidden min-w-[200px] shadow-2xl py-2">
                 {[
-                  { code: 'GB', name: 'English', sub: 'English' },
-                  { code: 'CN', name: '中文', sub: 'Chinese' },
-                  { code: 'IN', name: 'हिन्दी', sub: 'Hindi' },
-                  { code: 'ES', name: 'Español', sub: 'Spanish' },
-                  { code: 'FR', name: 'Français', sub: 'French' },
-                  { code: 'AE', name: 'العربية', sub: 'Arabic' },
-                ].map((lang) => (
-                  <button key={lang.code} onClick={handleLanguageSelect} className="w-full px-5 py-3 text-left hover:bg-[#CAF5A6]/10 transition-colors flex items-center justify-between group">
+                  { code: 'GB', name: 'English', sub: 'English', langCode: 'en' },
+                  { code: 'CN', name: '中文', sub: 'Chinese', langCode: 'zh' },
+                  { code: 'IN', name: 'हिन्दी', sub: 'Hindi', langCode: 'hi' },
+                  { code: 'ES', name: 'Español', sub: 'Spanish', langCode: 'es' },
+                  { code: 'FR', name: 'Français', sub: 'French', langCode: 'fr' },
+                  { code: 'AE', name: 'العربية', sub: 'Arabic', langCode: 'ar' },
+                ].map((l) => (
+                  <button key={l.code} onClick={(e) => handleLanguageSelect(e, l.langCode as Lang)} className="w-full px-5 py-3 text-left hover:bg-[#CAF5A6]/10 transition-colors flex items-center justify-between group">
                     <div className="flex items-center gap-3">
-                      <span className="text-[#CAF5A6] text-[13px] font-medium w-[20px]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{lang.code}</span>
-                      <span className="text-[#F5F5F0] text-[15px] group-hover:text-[#CAF5A6] transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{lang.name}</span>
+                      <span className="text-[#CAF5A6] text-[13px] font-medium w-[20px]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{l.code}</span>
+                      <span className="text-[#F5F5F0] text-[15px] group-hover:text-[#CAF5A6] transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{l.name}</span>
                     </div>
-                    <span className="text-[#F5F5F0]/40 text-[11px]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{lang.sub}</span>
+                    <span className="text-[#F5F5F0]/40 text-[11px]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>{l.sub}</span>
                   </button>
                 ))}
               </div>

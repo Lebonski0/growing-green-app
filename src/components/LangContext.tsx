@@ -19,7 +19,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   // Restore from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem('gg_lang') as Lang | null;
-    if (stored && ['en', 'fr', 'es'].includes(stored)) {
+    if (stored && ['en', 'fr', 'es', 'zh', 'hi', 'ar'].includes(stored)) {
       setLangState(stored);
     }
   }, []);
