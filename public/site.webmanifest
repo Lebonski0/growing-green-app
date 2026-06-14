@@ -1,6 +1,7 @@
 {
   "name": "Green Garden",
   "short_name": "Green Garden",
+  "start_url": "/garden",
   "icons": [
     {
       "src": "/favicon-16x16.png",
