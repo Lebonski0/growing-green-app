@@ -26,24 +26,34 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://growing-green-app.vercel.app'),
-  title: 'Green Garden — Your AI Plant Plan, Free & Private',
-  description: 'Answer 5 questions about your garden and get an AI-powered native plant plan tailored to your climate, soil, and sun. Free, private, no account needed. Your data is deleted after your plan is sent.',
-  keywords: ['sustainable garden', 'native plants', 'AI garden planner', 'free garden plan', 'organic gardening'],
+  title: 'Green Garden: Build your perfect sustainable garden with AI.',
+  description: 'Answer 7 questions to get a hyper-local blueprint of native plants perfectly matched to your climate and soil. 100% free, private, and zero accounts required.',
+  keywords: ['sustainable garden', 'native plants', 'AI garden planner', 'free garden plan', 'organic gardening', 'permaculture'],
   openGraph: {
-    title: 'Green Garden — Your AI Plant Plan',
-    description: 'Free. Private. 5 questions. Your personalized garden plan, emailed to you and then deleted forever.',
+    title: 'Green Garden: Build your perfect sustainable garden with AI.',
+    description: 'Answer 7 questions to get a hyper-local blueprint of native plants perfectly matched to your climate and soil. 100% free, private, and zero accounts required.',
+    siteName: 'Green Garden',
     type: 'website',
     locale: 'en_US',
+    url: 'https://growing-green-app.vercel.app',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Green Garden — Your AI Plant Plan',
-    description: 'Free. Private. 5 questions. Your personalized garden plan, emailed to you and then deleted forever.',
+    title: 'Green Garden: Build your perfect sustainable garden with AI.',
+    description: 'Answer 7 questions to get a hyper-local blueprint of native plants perfectly matched to your climate and soil. 100% free, private, and zero accounts required.',
   },
-  icons: [
-    { rel: 'icon', url: '/assets/Lined Logo Dark.svg', media: '(prefers-color-scheme: light)' },
-    { rel: 'icon', url: '/assets/Lined Logo White.svg', media: '(prefers-color-scheme: dark)' },
-  ]
+  manifest: '/site.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/assets/Logo Dark.svg', media: '(prefers-color-scheme: light)' },
+      { url: '/assets/Logo White.svg', media: '(prefers-color-scheme: dark)' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  }
 };
 
 export default function RootLayout({
