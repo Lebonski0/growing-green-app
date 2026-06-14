@@ -90,6 +90,15 @@ const EN_OPTIONS: Record<string, string> = {
   soilNo: 'No – Use regional defaults',
 };
 
+const QUICK_TAGS: Record<string, string[]> = {
+  en: ['Sandy', 'Clay', 'Acidic'],
+  fr: ['Sableux', 'Argileux', 'Acide'],
+  es: ['Arenoso', 'Arcilloso', 'Ácido'],
+  zh: ['沙质', '粘土', '酸性'],
+  hi: ['रेतीली', 'मिट्टी', 'अम्लीय'],
+  ar: ['رملية', 'طينية', 'حمضية'],
+};
+
 type Answers = {
   gardenType: string;
   climateZone: string;
@@ -355,6 +364,29 @@ export default function QuestionsScreen() {
               }}>
                 {t(lang, 'soilInputLabel')}
               </label>
+
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                {(QUICK_TAGS[lang] || QUICK_TAGS['en']).map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => setSoilDetails(prev => prev ? `${prev}, ${tag}` : tag)}
+                    style={{
+                      background: 'rgba(255,255,255,0.7)',
+                      border: '1.5px solid rgba(255,255,255,0.9)',
+                      borderRadius: '9999px',
+                      padding: '6px 12px',
+                      fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                      fontSize: '12px',
+                      color: '#052107',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                    }}
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+
               <textarea
                 value={soilDetails}
                 onChange={(e) => setSoilDetails(e.target.value)}

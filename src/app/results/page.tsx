@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useLang } from '@/components/LangContext';
+import { t } from '@/lib/translations';
 
 interface Plant {
   id: string;
@@ -32,6 +34,7 @@ interface RecommendResponse {
 
 export default function ResultsScreen() {
   const router = useRouter();
+  const { lang } = useLang();
   
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<RecommendResponse | null>(null);
@@ -40,16 +43,17 @@ export default function ResultsScreen() {
   // Email states
   const [email, setEmail] = useState('');
   const [emailState, setEmailState] = useState<'default' | 'error' | 'sending' | 'success'>('default');
-  const [emailErrorMsg, setEmailErrorMsg] = useState('Please enter a valid email address');
+  const [emailErrorMsg, setEmailErrorMsg] = useState('');
 
   // Loading text timer
-  const [loadingText, setLoadingText] = useState('Growing your plan...');
+  const [loadingText, setLoadingText] = useState('');
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (loading) {
+      setLoadingText(t(lang, 'loadingText1'));
       timer = setTimeout(() => {
-        setLoadingText('Consulting our plant expert...');
+        setLoadingText(t(lang, 'loadingText2'));
       }, 3000);
     }
     return () => clearTimeout(timer);
@@ -78,10 +82,12 @@ export default function ResultsScreen() {
       const answers = storedAnswers ? JSON.parse(storedAnswers) : null;
 
       try {
+        const lang = localStorage.getItem('gg_lang') || 'en';
+        
         const res = await fetch('/api/recommend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(answers),
+          body: JSON.stringify({ ...answers, lang }),
         });
         
         if (!res.ok) throw new Error('Failed to fetch recommendations');
@@ -107,7 +113,7 @@ export default function ResultsScreen() {
     // Robust email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (!emailRegex.test(trimmedEmail)) {
-      setEmailErrorMsg('Please enter a valid email address');
+      setEmailErrorMsg(t(lang, 'emailError'));
       setEmailState('error');
       return;
     }
@@ -195,10 +201,10 @@ export default function ResultsScreen() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌿</div>
           <h2 style={{ fontFamily: 'var(--font-charon), Georgia, serif', fontSize: '20px', color: '#052107', marginBottom: '12px' }}>
-            Something went wrong
+            {t(lang, 'errorTitle')}
           </h2>
           <p style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '14px', color: 'rgba(5,33,7,0.7)', marginBottom: '24px' }}>
-            {error || 'Could not load your recommendations.'}
+            {error || t(lang, 'errorBody')}
           </p>
           <button
             onClick={() => router.push('/questions')}
@@ -214,7 +220,7 @@ export default function ResultsScreen() {
               cursor: 'pointer',
             }}
           >
-            Try Again
+            {t(lang, 'tryAgain')}
           </button>
         </div>
       </>
@@ -265,7 +271,7 @@ export default function ResultsScreen() {
               color: '#052107',
               lineHeight: 1.4,
             }}>
-              Based on your input, here are our top recommendations for your green garden
+              {t(lang, 'resultsHeader')}
             </p>
           </div>
 
@@ -452,7 +458,7 @@ export default function ResultsScreen() {
               color: '#052107',
               marginBottom: '4px',
             }}>
-              Save your results
+              {t(lang, 'saveResults')}
             </h3>
             <p style={{
               fontFamily: 'var(--font-inter), system-ui, sans-serif',
@@ -462,7 +468,7 @@ export default function ResultsScreen() {
               marginBottom: '4px',
               lineHeight: 1.4,
             }}>
-              Send your personalized garden plan to your email
+              {t(lang, 'saveResultsBody')}
             </p>
             <p style={{
               fontFamily: 'var(--font-inter), system-ui, sans-serif',
@@ -471,7 +477,7 @@ export default function ResultsScreen() {
               color: '#37613A',
               marginBottom: '16px',
             }}>
-              ⓘ For your privacy, Green Garden does not save data from your inputs
+              {t(lang, 'privacyNote')}
             </p>
 
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -479,7 +485,7 @@ export default function ResultsScreen() {
                 type="text"
                 inputMode="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t(lang, 'emailPlaceholder')}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -522,7 +528,7 @@ export default function ResultsScreen() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {emailState === 'sending' ? '...' : 'Send'}
+                {emailState === 'sending' ? t(lang, 'sending') : t(lang, 'send')}
               </button>
             </div>
             
@@ -547,7 +553,7 @@ export default function ResultsScreen() {
                 marginTop: '8px',
                 paddingLeft: '12px',
               }}>
-                ✓ Thank you! Expect an email shortly
+                {t(lang, 'emailSuccess')}
               </p>
             )}
             {emailState === 'sending' && (
@@ -559,7 +565,7 @@ export default function ResultsScreen() {
                 marginTop: '8px',
                 paddingLeft: '12px',
               }}>
-                Sending your plan...
+                {t(lang, 'emailSending')}
               </p>
             )}
           </div>

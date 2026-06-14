@@ -16,7 +16,7 @@ export default function IntroScreen() {
     return () => clearTimeout(timer);
   }, []);
 
-  const flagMap = { en: '🇬🇧', fr: '🇫🇷', es: '🇪🇸' };
+  const flagMap = { en: '🇬🇧', fr: '🇫🇷', es: '🇪🇸', zh: '🇨🇳', hi: '🇮🇳', ar: '🇦🇪' };
 
   return (
     <main className="relative bg-intro grain-overlay flex flex-col items-center justify-center min-h-[100dvh] w-full max-w-[430px] mx-auto overflow-hidden">

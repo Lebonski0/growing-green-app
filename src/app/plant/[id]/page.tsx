@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
+import { useLang } from '@/components/LangContext';
+import { t } from '@/lib/translations';
 
 interface Plant {
   id: string;
@@ -34,6 +36,7 @@ export default function PlantDetailScreen() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const { lang } = useLang();
 
   const [plant, setPlant] = useState<Plant | null>(null);
   const [partner, setPartner] = useState<Partner | null>(null);
@@ -83,10 +86,10 @@ export default function PlantDetailScreen() {
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌿</div>
           <h2 style={{ fontFamily: 'var(--font-charon), Georgia, serif', fontSize: '20px', color: '#052107', marginBottom: '12px' }}>
-            Plant not found
+            {t(lang, 'plantNotFound')}
           </h2>
           <p style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '14px', color: 'rgba(5,33,7,0.7)', marginBottom: '24px' }}>
-            Your session may have expired.
+            {t(lang, 'sessionExpired')}
           </p>
           <button
             onClick={() => router.push('/')}
@@ -96,7 +99,7 @@ export default function PlantDetailScreen() {
               borderRadius: '9999px', padding: '12px 32px', border: 'none', cursor: 'pointer',
             }}
           >
-            Start Over
+            {t(lang, 'startOver')}
           </button>
         </div>
       </>
@@ -109,7 +112,7 @@ export default function PlantDetailScreen() {
       <div style={{ position: 'fixed', inset: 0, backgroundImage: "url('/assets/gradient-1.png')", backgroundSize: 'cover' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           <p style={{ fontFamily: 'var(--font-charon), Georgia, serif', fontSize: '20px', color: '#052107' }}>
-            Loading...
+            {t(lang, 'loadingText1')}
           </p>
         </div>
       </div>
@@ -226,8 +229,8 @@ export default function PlantDetailScreen() {
                   WebkitBackdropFilter: 'blur(8px)', borderRadius: '10px',
                   padding: '8px 14px', flex: 1, minWidth: '100px',
                 }}>
-                  <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '10px', color: '#37613A', fontWeight: 700, marginBottom: '2px' }}>
-                    WHEN TO PLANT
+                  <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '10px', color: '#37613A', fontWeight: 700, marginBottom: '2px', textTransform: 'uppercase' }}>
+                    {t(lang, 'whenToPlant')}
                   </div>
                   <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '13px', color: '#052107', fontWeight: 400 }}>
                     {plant.whenToPlant}
@@ -240,8 +243,8 @@ export default function PlantDetailScreen() {
                   WebkitBackdropFilter: 'blur(8px)', borderRadius: '10px',
                   padding: '8px 14px', flex: 1, minWidth: '100px',
                 }}>
-                  <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '10px', color: '#37613A', fontWeight: 700, marginBottom: '2px' }}>
-                    HOW TO START
+                  <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '10px', color: '#37613A', fontWeight: 700, marginBottom: '2px', textTransform: 'uppercase' }}>
+                    {t(lang, 'howToStart')}
                   </div>
                   <div style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontSize: '13px', color: '#052107', fontWeight: 400 }}>
                     {plant.howToStart}
@@ -265,7 +268,7 @@ export default function PlantDetailScreen() {
             fontFamily: 'var(--font-inter), system-ui, sans-serif',
             fontWeight: 700, fontSize: '16px', color: '#052107', marginBottom: '14px',
           }}>
-            Best Practices
+            {t(lang, 'bestPractices')}
           </h2>
           <ol style={{
             listStyleType: 'decimal', paddingLeft: '20px',
@@ -311,7 +314,7 @@ export default function PlantDetailScreen() {
                 fontWeight: 700, fontSize: '10px', color: '#37613A',
                 textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px',
               }}>
-                Material / Resource
+                {t(lang, 'materialResource')}
               </span>
               <h3 style={{
                 fontFamily: 'var(--font-inter), system-ui, sans-serif',
@@ -336,7 +339,7 @@ export default function PlantDetailScreen() {
                 padding: '6px 18px', borderRadius: '9999px',
                 cursor: 'pointer', minHeight: '36px',
               }}>
-                View
+                {t(lang, 'view')}
               </button>
             </div>
           </div>

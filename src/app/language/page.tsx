@@ -7,8 +7,11 @@ import { useEffect, useState } from 'react';
 
 const LANGUAGES: { code: Lang; flag: string; name: string; native: string }[] = [
   { code: 'en', flag: '🇬🇧', name: 'English', native: 'English' },
-  { code: 'fr', flag: '🇫🇷', name: 'French', native: 'Français' },
+  { code: 'zh', flag: '🇨🇳', name: 'Chinese', native: '中文' },
+  { code: 'hi', flag: '🇮🇳', name: 'Hindi', native: 'हिन्दी' },
   { code: 'es', flag: '🇪🇸', name: 'Spanish', native: 'Español' },
+  { code: 'fr', flag: '🇫🇷', name: 'French', native: 'Français' },
+  { code: 'ar', flag: '🇦🇪', name: 'Arabic', native: 'العربية' },
 ];
 
 export default function LanguageScreen() {
@@ -67,12 +70,12 @@ export default function LanguageScreen() {
           }}>
             Green Garden
           </h1>
-          <p style={{
+            <p style={{
             fontFamily: 'var(--font-inter), system-ui, sans-serif',
             fontSize: '13px',
             color: 'rgba(5,33,7,0.6)',
           }}>
-            Choose your language · Choisissez votre langue · Elige tu idioma
+            Choose your language · 选择您的语言 · अपनी भाषा चुनें
           </p>
         </div>
 

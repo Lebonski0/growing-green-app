@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     
-    const { gardenType, climateZone, sunExposure, plotSize, soilTest } = body;
+    const { gardenType, climateZone, sunExposure, plotSize, soilTest, lang = 'en' } = body;
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
@@ -45,7 +45,8 @@ Rules:
 - Best practices must be practical and actionable (not generic)
 - Tags maximum 2 per plant, short (1-2 words each)
 - All content must be understandable by a 10-year-old AND a 70-year-old
-- Partner is always a generic local nursery placeholder for now
+- The "partner" object MUST be a "Community Resource" recommendation (e.g., local seed library, community garden, or Facebook plant swap group).
+- **CRITICAL: You MUST translate ALL output strings (names, descriptions, practices, resource names, tags) into the language corresponding to language code: "${lang}". Keep the JSON keys in English.**
 
 Output JSON format exactly like this:
 {
@@ -64,9 +65,9 @@ Output JSON format exactly like this:
     }
   ],
   "partner": {
-    "name": "Local Nursery Partner",
-    "location": "Your nearest garden center",
-    "imageQuery": "garden nursery plants"
+    "name": "Community Seed Library (or similar)",
+    "location": "A helpful action they can take locally",
+    "imageQuery": "community garden"
   }
 }`;
 
@@ -126,9 +127,9 @@ Soil Test Results: ${soilTest || 'None provided'}
     // Ensure partner exists
     if (!parsedJson.partner) {
       parsedJson.partner = {
-        name: 'Local Nursery Partner',
-        location: 'Check your nearest garden center',
-        imageQuery: 'garden nursery plants',
+        name: 'Community Resource',
+        location: 'Look for local seed swaps or community gardens',
+        imageQuery: 'community garden',
       };
     }
 
@@ -222,9 +223,9 @@ Soil Test Results: ${soilTest || 'None provided'}
         }
       ],
       partner: {
-        name: "Local Nursery Partner",
-        location: "Check your nearest garden center",
-        imageQuery: "garden nursery plants",
+        name: "Local Seed Library",
+        location: "Check your local library or community center for seed swaps.",
+        imageQuery: "community garden",
         imageUrl: encodeURI("/images/screens/Lawn Replacemen.jpg")
       }
     };
