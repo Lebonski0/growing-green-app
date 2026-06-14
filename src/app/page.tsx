@@ -42,6 +42,14 @@ export default function LandingPage() {
         html { scroll-behavior: smooth; }
         .nav-dropdown:hover .dropdown-menu { display: block; }
         .svg-white { filter: brightness(0) invert(1); }
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+          100% { transform: translateY(0px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
       ` }} />
       
       {/* PROFESSIONAL NAVBAR WITH LANGUAGE DROPDOWN */}
@@ -226,8 +234,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Scalable - Spans 4 columns */}
-            <div className="md:col-span-4 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
+            {/* Scalable - Spans 6 columns */}
+            <div className="md:col-span-6 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
               <div>
                 <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Stateless</h3>
                 <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
@@ -236,22 +244,51 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* User Friendly - Spans 8 columns (Merged with CTA to save space) */}
-            <div className="md:col-span-8 bg-[#CAF5A6] rounded-[32px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="max-w-[360px]">
-                <h3 className="text-[#052107] text-[28px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Five taps. That&apos;s it.</h3>
-                <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                  A child and a grandparent can both use it with zero friction. Get your plan right now.
+            {/* User Friendly - Spans 6 columns */}
+            <div className="md:col-span-6 bg-[#CAF5A6] rounded-[32px] p-8 flex flex-col justify-between">
+              <div>
+                <h3 className="text-[#052107] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>User Friendly</h3>
+                <p className="text-[14px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                  Five taps. That&apos;s it. A child and a grandparent can both use it with zero friction.
                 </p>
               </div>
-              <Link href="/garden" 
-                    className="bg-[#052107] text-[#FFFFFF] text-[15px] rounded-full hover:scale-[1.03] transition-transform duration-200 flex items-center justify-center shrink-0 w-full md:w-auto"
-                    style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '0 40px', minHeight: '52px' }}>
-                Get Started
-              </Link>
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* SECTION 4 - Final CTA (Premium Glow) */}
+      <section className="relative w-full bg-[#031404] py-[100px] px-[24px] z-10 overflow-hidden">
+        <GrainTexture />
+        <div className="relative max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-12 z-10">
+          
+          {/* Left Side: Content */}
+          <div className="flex-1 max-w-[480px]">
+            <h2 className="text-[#F5F5F0] mb-6 leading-[1.1]" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(40px, 5vw, 56px)', fontWeight: 700 }}>
+              Ready to grow<br />right?
+            </h2>
+            <p className="text-[16px] text-[#F5F5F0]/70 leading-[1.7] mb-8" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              Experience the magic of an AI-powered garden plan. Perfectly tailored to your climate, completely private, and absolutely free.
+            </p>
+            <Link href="/garden" 
+                  className="bg-[#FFFFFF] text-[#052107] text-[16px] rounded-full hover:scale-[1.03] transition-transform duration-200 ease-out inline-flex items-center justify-center"
+                  style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '0 40px', minHeight: '56px', boxShadow: '0 8px 32px rgba(255,255,255,0.15)' }}>
+              Get Started
+            </Link>
+          </div>
+
+          {/* Right Side: Glowing Phone Mockup */}
+          <div className="flex-1 relative flex justify-center items-center h-[460px] w-full">
+            {/* The Glow Halo */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[400px] bg-gradient-to-tr from-[#CAF5A6] to-[#37613A] blur-[80px] opacity-[0.35] rounded-full mix-blend-screen"></div>
+            
+            {/* The Phone */}
+            <div className="relative z-10 w-[230px] h-[460px] animate-float">
+              <Image src="/assets/phone-mockup.png" alt="App Preview" fill className="object-contain drop-shadow-2xl" />
+            </div>
+          </div>
+
         </div>
       </section>
 

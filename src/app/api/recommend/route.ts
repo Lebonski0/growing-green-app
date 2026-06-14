@@ -6,7 +6,7 @@ async function fetchImage(query: string): Promise<string | null> {
   try {
     const res = await fetch(
       `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=3`,
-      { signal: AbortSignal.timeout(4000) }
+      { signal: AbortSignal.timeout(8000) }
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -83,6 +83,7 @@ IMPORTANT RULES:
 - Maximum 2 tags per plant (1-2 words each).
 - The partner object MUST describe a real community resource (seed library, community garden, plant swap).
 - Translate ALL text values to the language with code: "${lang}". Keep JSON keys in English.
+- EXCEPTION: Do NOT translate 'scientificName' and 'imageQuery'. These MUST remain in English so the image search API works.
 - Return ONLY the raw JSON object below — no markdown fences, no preamble, no explanation.
 
 Required JSON shape:
