@@ -26,6 +26,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://growing-green-app.vercel.app'),
   title: 'Green Garden — Your AI Plant Plan, Free & Private',
   description: 'Answer 5 questions about your garden and get an AI-powered native plant plan tailored to your climate, soil, and sun. Free, private, no account needed. Your data is deleted after your plan is sent.',
   keywords: ['sustainable garden', 'native plants', 'AI garden planner', 'free garden plan', 'organic gardening'],
@@ -40,9 +41,10 @@ export const metadata: Metadata = {
     title: 'Green Garden — Your AI Plant Plan',
     description: 'Free. Private. 5 questions. Your personalized garden plan, emailed to you and then deleted forever.',
   },
-  icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>"
-  }
+  icons: [
+    { rel: 'icon', url: '/assets/Lined Logo Dark.svg', media: '(prefers-color-scheme: light)' },
+    { rel: 'icon', url: '/assets/Lined Logo White.svg', media: '(prefers-color-scheme: dark)' },
+  ]
 };
 
 export default function RootLayout({
