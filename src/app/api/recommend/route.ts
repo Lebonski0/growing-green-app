@@ -1,5 +1,22 @@
 import { NextResponse } from 'next/server';
 
+async function fetchWikimediaImage(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=800`, { signal: AbortSignal.timeout(3000) });
+    const data = await res.json();
+    const pages = data.query?.pages;
+    if (pages) {
+      const pageId = Object.keys(pages)[0];
+      if (pageId !== '-1' && pages[pageId].thumbnail?.source) {
+        return pages[pageId].thumbnail.source;
+      }
+    }
+  } catch (e) {
+    console.error("Wikimedia fetch error for", query, e);
+  }
+  return null;
+}
+
 export const maxDuration = 25; // Setup max duration for Vercel/Next.js if needed
 
 export async function POST(req: Request) {
@@ -111,6 +128,17 @@ Soil Test Results: ${soilTest || 'None provided'}
       };
     }
 
+    // Fetch images from Wikimedia
+    await Promise.all(parsedJson.plants.map(async (plant: any) => {
+      let img = await fetchWikimediaImage(plant.scientificName || plant.name);
+      if (!img && plant.scientificName) {
+         img = await fetchWikimediaImage(plant.name);
+      }
+      plant.imageUrl = img || '/images/screens/Full Sun.jpg'; // fallback
+    }));
+
+    parsedJson.partner.imageUrl = '/images/screens/Lawn Replacemen.jpg';
+
     return NextResponse.json(parsedJson);
 
   } catch (error) {
@@ -133,7 +161,8 @@ Soil Test Results: ${soilTest || 'None provided'}
           howToStart: "Transplant",
           careLevel: "Easy",
           tags: ["Drought Tolerant", "Pollinator"],
-          imageQuery: "lavender field purple"
+          imageQuery: "lavender field purple",
+          imageUrl: "/images/screens/Pollinator Garden.jpg"
         },
         {
           id: "rosemary",
@@ -145,7 +174,8 @@ Soil Test Results: ${soilTest || 'None provided'}
           howToStart: "Transplant or cuttings",
           careLevel: "Easy",
           tags: ["Full Sun", "Aromatic"],
-          imageQuery: "rosemary bush"
+          imageQuery: "rosemary bush",
+          imageUrl: "/images/screens/Vegetable Plot.jpg"
         },
         {
           id: "thyme",
@@ -157,7 +187,8 @@ Soil Test Results: ${soilTest || 'None provided'}
           howToStart: "Direct seed or transplant",
           careLevel: "Easy",
           tags: ["Edible", "Hardy"],
-          imageQuery: "thyme herb"
+          imageQuery: "thyme herb",
+          imageUrl: "/images/screens/Continental.jpg"
         },
         {
           id: "sage",
@@ -169,7 +200,8 @@ Soil Test Results: ${soilTest || 'None provided'}
           howToStart: "Transplant",
           careLevel: "Medium",
           tags: ["Low Water", "Edible"],
-          imageQuery: "sage plant leaves"
+          imageQuery: "sage plant leaves",
+          imageUrl: "/images/screens/Temperate.jpg"
         },
         {
           id: "oregano",
@@ -181,13 +213,15 @@ Soil Test Results: ${soilTest || 'None provided'}
           howToStart: "Direct seed or cuttings",
           careLevel: "Easy",
           tags: ["Edible", "Perennial"],
-          imageQuery: "oregano herb garden"
+          imageQuery: "oregano herb garden",
+          imageUrl: "/images/screens/Mediterranean.jpg"
         }
       ],
       partner: {
         name: "Local Nursery Partner",
         location: "Check your nearest garden center",
-        imageQuery: "garden nursery plants"
+        imageQuery: "garden nursery plants",
+        imageUrl: "/images/screens/Lawn Replacemen.jpg"
       }
     };
 

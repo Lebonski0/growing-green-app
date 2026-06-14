@@ -15,12 +15,14 @@ interface Plant {
   careLevel?: string;
   tags: string[];
   imageQuery?: string;
+  imageUrl?: string;
 }
 
 interface Partner {
   name: string;
   location: string;
   imageQuery: string;
+  imageUrl?: string;
 }
 
 interface RecommendResponse {
@@ -296,7 +298,7 @@ export default function ResultsScreen() {
                 position: 'relative'
               }}>
                 <Image 
-                  src={`https://source.unsplash.com/featured/800x400?${encodeURIComponent(data.plants[0].imageQuery || 'garden plant')}&sig=${data.plants[0].id}`} 
+                  src={data.plants[0].imageUrl || '/images/screens/Full Sun.jpg'} 
                   alt={data.plants[0].name}
                   fill 
                   style={{ objectFit: 'cover' }} 
@@ -380,7 +382,7 @@ export default function ResultsScreen() {
                     flexShrink: 0,
                   }}>
                     <Image 
-                      src={`https://source.unsplash.com/featured/400x300?${encodeURIComponent(plant.imageQuery || 'plant')}&sig=${plant.id}`} 
+                      src={plant.imageUrl || '/images/screens/Partial sun.jpg'} 
                       alt={plant.name}
                       fill 
                       style={{ objectFit: 'cover' }} 

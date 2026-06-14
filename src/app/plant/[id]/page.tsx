@@ -15,12 +15,14 @@ interface Plant {
   careLevel?: string;
   tags: string[];
   imageQuery?: string;
+  imageUrl?: string;
 }
 
 interface Partner {
   name: string;
   location: string;
   imageQuery: string;
+  imageUrl?: string;
 }
 
 interface RecommendResponse {
@@ -114,10 +116,8 @@ export default function PlantDetailScreen() {
     );
   }
 
-  const imageUrl = `https://source.unsplash.com/featured/800x450?${encodeURIComponent(plant.imageQuery || 'garden plant')}&sig=${plant.id}`;
-  const partnerImageUrl = partner
-    ? `https://source.unsplash.com/featured/300x300?${encodeURIComponent(partner.imageQuery || 'garden nursery')}&sig=partner`
-    : `https://source.unsplash.com/featured/300x300?garden nursery&sig=partner`;
+  const imageUrl = plant.imageUrl || '/images/screens/Full Sun.jpg';
+  const partnerImageUrl = partner?.imageUrl || '/images/screens/Lawn Replacemen.jpg';
 
   return (
     <>
