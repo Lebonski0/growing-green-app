@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -41,7 +41,7 @@ const QUESTIONS = [
     id: 'climateZone',
     title: 'Where in the world are you growing?',
     options: ['Tropical', 'Arid / Desert', 'Mediterranean', 'Temperate', 'Continental', 'Subtropical'],
-    gridCols: 2,
+    gridCols: 3, // 3 columns for 6 items — no scroll needed
   },
   {
     id: 'sunExposure',
@@ -82,8 +82,10 @@ export default function QuestionsScreen() {
     soilTest: null,
   });
   const [soilDetails, setSoilDetails] = useState('');
+  const [animating, setAnimating] = useState(false);
 
   const q = QUESTIONS[currentStep];
+  const isLast = currentStep === QUESTIONS.length - 1;
 
   const currentAnswer = (): string | null => {
     if (q.id === 'soilTest') return answers.soilTest;
@@ -95,26 +97,33 @@ export default function QuestionsScreen() {
     return val !== '' && val !== null;
   };
 
-  const handleSelect = (label: string) => {
-    if (q.id === 'soilTest') {
-      setAnswers({ ...answers, soilTest: label });
-    } else {
-      setAnswers({ ...answers, [q.id]: label });
-    }
-  };
-
   const isSelected = (label: string): boolean => currentAnswer() === label;
 
-  const handleNext = () => {
-    if (isAnswered() && currentStep < QUESTIONS.length - 1) {
+  const advanceStep = useCallback(() => {
+    if (animating) return;
+    setAnimating(true);
+    setTimeout(() => {
       setCurrentStep((s) => s + 1);
-    }
-  };
+      setAnimating(false);
+    }, 260);
+  }, [animating]);
 
-  const handlePrev = () => {
-    if (currentStep > 0) setCurrentStep((s) => s - 1);
-    else router.push('/');
-  };
+  const handleSelect = useCallback((label: string) => {
+    // Update the answer first
+    const newAnswers = q.id === 'soilTest'
+      ? { ...answers, soilTest: label }
+      : { ...answers, [q.id]: label };
+    setAnswers(newAnswers);
+
+    // Auto-advance — but on soil test only if "No" (no text input needed)
+    if (!isLast) {
+      if (q.id === 'soilTest' && label === 'Yes – I have test results') {
+        // Stay — user needs to fill in soil details
+        return;
+      }
+      setTimeout(() => advanceStep(), 180); // tiny delay so selection flash is visible
+    }
+  }, [answers, q.id, isLast, advanceStep]);
 
   const handleComplete = () => {
     if (isAnswered()) {
@@ -123,7 +132,13 @@ export default function QuestionsScreen() {
     }
   };
 
-  const isLast = currentStep === QUESTIONS.length - 1;
+  const handlePrev = () => {
+    if (currentStep > 0) setCurrentStep((s) => s - 1);
+    else router.push('/');
+  };
+
+  // Whether the question has 6 options (climate) — use compact card style
+  const isCompact = q.options.length === 6;
 
   return (
     <>
@@ -139,7 +154,7 @@ export default function QuestionsScreen() {
         }}
       />
 
-      {/* Page wrapper — full screen, flex column */}
+      {/* Page wrapper */}
       <div
         style={{
           position: 'fixed',
@@ -151,42 +166,90 @@ export default function QuestionsScreen() {
           zIndex: 1,
         }}
       >
+        {/* ── TOP HEADER with progress dots ── */}
+        <div style={{
+          flexShrink: 0,
+          padding: '20px 24px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          {/* Back arrow */}
+          <button
+            onClick={handlePrev}
+            aria-label="Previous"
+            style={{
+              padding: '8px',
+              borderRadius: '9999px',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <Image src="/assets/Arrow left.svg" alt="Previous" width={24} height={24} />
+          </button>
+
+          {/* Progress dots */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {QUESTIONS.map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: i === currentStep ? '22px' : '8px',
+                  height: '8px',
+                  borderRadius: '9999px',
+                  background: i <= currentStep ? '#37613A' : 'rgba(5,33,7,0.18)',
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Spacer to balance the back arrow */}
+          <div style={{ width: '40px' }} />
+        </div>
+
         {/* ── SCROLLABLE CONTENT ── */}
         <div
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '48px 20px 16px',
+            padding: isCompact ? '20px 20px 12px' : '28px 20px 16px',
+            opacity: animating ? 0 : 1,
+            transform: animating ? 'translateY(8px)' : 'translateY(0)',
+            transition: 'opacity 0.25s ease, transform 0.25s ease',
           }}
         >
-          {/* Question number */}
+          {/* Question title */}
           <h1 style={{
             fontFamily: 'var(--font-charon), Georgia, serif',
             fontWeight: 700,
-            fontSize: '24px',
+            fontSize: isCompact ? '20px' : '24px',
             color: '#052107',
             marginBottom: '4px',
             lineHeight: 1.2,
           }}>
-            Question {currentStep + 1}
+            {q.title}
           </h1>
 
-          {/* Question text */}
+          {/* Subtle step label */}
           <p style={{
             fontFamily: 'var(--font-inter), system-ui, sans-serif',
-            fontSize: '14px',
-            color: 'rgba(5,33,7,0.75)',
-            marginBottom: '24px',
-            lineHeight: 1.5,
+            fontSize: '12px',
+            color: 'rgba(5,33,7,0.5)',
+            marginBottom: isCompact ? '16px' : '20px',
           }}>
-            {q.title}
+            Question {currentStep + 1} of {QUESTIONS.length}
           </p>
 
           {/* Options grid */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${q.gridCols}, 1fr)`,
-            gap: '12px',
+            gap: isCompact ? '8px' : '12px',
           }}>
             {q.options.map((opt) => {
               const selected = isSelected(opt);
@@ -199,43 +262,43 @@ export default function QuestionsScreen() {
                     flexDirection: 'column',
                     alignItems: 'flex-start',
                     textAlign: 'left',
-                    padding: '8px',
-                    borderRadius: '16px',
+                    padding: isCompact ? '6px' : '8px',
+                    borderRadius: '14px',
                     border: selected ? '2px solid #37613A' : '1.5px solid rgba(255,255,255,0.6)',
-                    background: selected ? 'rgba(202,245,166,0.4)' : 'rgba(255,255,255,0.45)',
+                    background: selected ? 'rgba(202,245,166,0.45)' : 'rgba(255,255,255,0.45)',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    minHeight: '44px',
-                    boxShadow: selected ? '0 2px 12px rgba(55,97,58,0.15)' : '0 1px 4px rgba(0,0,0,0.06)',
+                    boxShadow: selected ? '0 2px 12px rgba(55,97,58,0.2)' : '0 1px 4px rgba(0,0,0,0.06)',
                   }}
                 >
                   {/* Option image */}
                   <div style={{
                     width: '100%',
-                    aspectRatio: '16/9',
+                    aspectRatio: isCompact ? '4/3' : '16/9',
                     background: 'rgba(211,222,213,0.55)',
-                    borderRadius: '10px',
-                    marginBottom: '8px',
+                    borderRadius: '8px',
+                    marginBottom: '6px',
                     overflow: 'hidden',
-                    position: 'relative'
+                    position: 'relative',
+                    flexShrink: 0,
                   }}>
-                    <Image 
-                      src={getOptionImage(opt)} 
-                      alt={opt} 
-                      fill 
-                      style={{ objectFit: 'cover' }} 
+                    <Image
+                      src={getOptionImage(opt)}
+                      alt={opt}
+                      fill
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                   {/* Label */}
                   <span style={{
                     fontFamily: 'var(--font-inter), system-ui, sans-serif',
                     fontWeight: 700,
-                    fontSize: '16px',
+                    fontSize: isCompact ? '11px' : '14px',
                     color: '#052107',
-                    paddingLeft: '4px',
-                    paddingBottom: '4px',
+                    paddingLeft: '2px',
+                    paddingBottom: '2px',
                     lineHeight: 1.3,
                   }}>
                     {opt}
@@ -245,7 +308,7 @@ export default function QuestionsScreen() {
             })}
           </div>
 
-          {/* Soil test input */}
+          {/* Soil test textarea — only shown when "Yes" is selected */}
           {q.id === 'soilTest' && answers.soilTest === 'Yes – I have test results' && (
             <div style={{ marginTop: '16px' }}>
               <label style={{
@@ -280,87 +343,38 @@ export default function QuestionsScreen() {
           )}
         </div>
 
-        {/* ── BOTTOM NAV — always visible ── */}
-        <div style={{
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '16px 24px 28px',
-          borderTop: '1px solid rgba(255,255,255,0.25)',
-        }}>
-          {/* Prev arrow */}
-          <button
-            onClick={handlePrev}
-            aria-label="Previous"
-            style={{
-              padding: '8px',
-              borderRadius: '9999px',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              minHeight: '44px',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <Image src="/assets/Arrow left.svg" alt="Previous" width={24} height={24} />
-          </button>
-
-          {/* Center */}
-          {isLast && isAnswered() ? (
+        {/* ── BOTTOM — Complete button (last step) or empty spacer ── */}
+        {isLast && (
+          <div style={{
+            flexShrink: 0,
+            padding: '12px 24px 32px',
+            borderTop: '1px solid rgba(255,255,255,0.25)',
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
             <button
               onClick={handleComplete}
+              disabled={!isAnswered()}
               style={{
-                background: '#37613A',
-                color: 'white',
+                background: isAnswered() ? '#37613A' : 'rgba(5,33,7,0.15)',
+                color: isAnswered() ? 'white' : 'rgba(5,33,7,0.4)',
                 fontFamily: 'var(--font-inter), system-ui, sans-serif',
                 fontWeight: 700,
-                fontSize: '14px',
+                fontSize: '15px',
                 borderRadius: '9999px',
-                padding: '10px 36px',
+                padding: '14px 48px',
                 border: 'none',
-                cursor: 'pointer',
-                minHeight: '44px',
-              }}
-            >
-              Complete
-            </button>
-          ) : (
-            <span style={{
-              fontFamily: 'var(--font-inter), system-ui, sans-serif',
-              fontWeight: 700,
-              fontSize: '12px',
-              color: isAnswered() ? '#052107' : 'rgba(5,33,7,0.35)',
-            }}>
-              Question {currentStep + 1} of {QUESTIONS.length}
-            </span>
-          )}
-
-          {/* Next arrow */}
-          {isLast && isAnswered() ? (
-            <div style={{ width: '40px' }} />
-          ) : (
-            <button
-              onClick={handleNext}
-              disabled={!isAnswered()}
-              aria-label="Next"
-              style={{
-                padding: '8px',
-                borderRadius: '9999px',
-                border: 'none',
-                background: 'transparent',
                 cursor: isAnswered() ? 'pointer' : 'not-allowed',
-                opacity: isAnswered() ? 1 : 0.3,
-                minHeight: '44px',
-                display: 'flex',
-                alignItems: 'center',
+                minHeight: '52px',
+                transition: 'all 0.2s ease',
+                width: '100%',
+                maxWidth: '280px',
               }}
             >
-              <Image src="/assets/Arrow right.svg" alt="Next" width={24} height={24} />
+              Get My Garden Plan 🌱
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );
