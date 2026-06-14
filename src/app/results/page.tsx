@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useLang } from '@/components/LangContext';
-import { t } from '@/lib/translations';
+import { t, type TranslationKey } from '@/lib/translations';
 
 interface Plant {
   id: string;
@@ -47,16 +47,29 @@ export default function ResultsScreen() {
 
   // Loading text timer
   const [loadingText, setLoadingText] = useState('');
+  const [loadingStep, setLoadingStep] = useState(0);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    const stepTimers: NodeJS.Timeout[] = [];
+    
     if (loading) {
       setLoadingText(t(lang, 'loadingText1'));
+      
+      // Step sequence animations
+      stepTimers.push(setTimeout(() => setLoadingStep(1), 800));
+      stepTimers.push(setTimeout(() => setLoadingStep(2), 2200));
+      stepTimers.push(setTimeout(() => setLoadingStep(3), 3800));
+      stepTimers.push(setTimeout(() => setLoadingStep(4), 5500));
+
       timer = setTimeout(() => {
         setLoadingText(t(lang, 'loadingText2'));
       }, 3000);
     }
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      stepTimers.forEach(clearTimeout);
+    };
   }, [loading, lang]);
 
   useEffect(() => {
@@ -176,23 +189,84 @@ export default function ResultsScreen() {
             animation: 'pulseBg 2s infinite ease-in-out',
           }}
         />
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes pulseBg {
-            0% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.02); }
-            100% { opacity: 0.7; transform: scale(1); }
-          }
-        `}} />
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '48px' }}>🌱</div>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '20vh', gap: '32px' }}>
+          
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes pulseBg {
+              0% { opacity: 0.7; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.02); }
+              100% { opacity: 0.7; transform: scale(1); }
+            }
+            @keyframes pulseLogo {
+              0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(202,245,166,0.3); }
+              50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(202,245,166,0.8); }
+              100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(202,245,166,0.3); }
+            }
+            @keyframes pulseDot {
+              0% { opacity: 0.4; transform: scale(0.8); }
+              50% { opacity: 1; transform: scale(1.2); }
+              100% { opacity: 0.4; transform: scale(0.8); }
+            }
+          `}} />
+
+          {/* Pulsing Leaf Icon */}
+          <div style={{
+            width: '80px', height: '80px', background: '#CAF5A6', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px',
+            animation: 'pulseLogo 2s infinite ease-in-out'
+          }}>
+            🌱
+          </div>
+
           <h2 style={{
             fontFamily: 'var(--font-charon), Georgia, serif',
-            fontWeight: 400,
-            fontSize: '20px',
+            fontWeight: 700,
+            fontSize: '22px',
             color: '#052107',
+            marginBottom: '8px'
           }}>
             {loadingText}
           </h2>
+
+          {/* ChatGPT-style Step Checklist */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '320px', padding: '0 24px' }}>
+            {['ls_step1', 'ls_step2', 'ls_step3', 'ls_step4'].map((key, i) => {
+              const isActive = loadingStep > i;
+              const isCurrent = loadingStep === i;
+              return (
+                <div key={key} style={{
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  opacity: isActive || isCurrent ? 1 : 0.3,
+                  transform: isActive || isCurrent ? 'translateX(0)' : 'translateX(-10px)',
+                  transition: 'all 0.5s ease-out',
+                }}>
+                  <div style={{
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    border: isActive ? 'none' : '2px solid rgba(5,33,7,0.2)',
+                    background: isActive ? '#37613A' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    {isActive && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
+                    {isCurrent && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#37613A', animation: 'pulseDot 1.5s infinite ease-in-out' }} />}
+                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-inter), system-ui, sans-serif',
+                    fontSize: '15px',
+                    fontWeight: isActive ? 700 : 500,
+                    color: '#052107',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    {t(lang, key as TranslationKey)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </>
     );

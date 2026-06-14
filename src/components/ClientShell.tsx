@@ -11,13 +11,9 @@ export default function ClientShell({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-  // For the actual app flow (/garden, /questions, /results, etc.), 
-  // wrap it in the botanical mobile shell for desktop users.
-  return (
-    <div className="desktop-shell">
-      <div className="app-container">
-        {children}
-      </div>
-    </div>
-  );
+  // By returning children directly, the botanical backgrounds 
+  // (bg-intro, bg-questions, bg-results) will automatically fill 
+  // the entire desktop screen, while the content remains centered 
+  // at 430px via the inner wrappers.
+  return <>{children}</>;
 }

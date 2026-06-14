@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useLang } from '@/components/LangContext';
-import type { Lang } from '@/lib/translations';
+import { t, type Lang } from '@/lib/translations';
 
 const GrainTexture = () => (
   <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden mix-blend-overlay">
@@ -30,13 +29,11 @@ const ChevronDown = () => (
 );
 
 export default function LandingPage() {
-  const router = useRouter();
   const { lang, setLang } = useLang();
 
   const handleLanguageSelect = (e: React.MouseEvent, selectedLangCode: Lang) => {
     e.preventDefault();
     setLang(selectedLangCode);
-    router.push('/garden'); // Routing back to garden flow after language selection
   };
 
   return (
@@ -73,11 +70,15 @@ export default function LandingPage() {
             <a href="#the-promise" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>The Promise</a>
             
             {/* Symmetrical Language Dropdown (Universality) */}
-            <div className="relative nav-dropdown py-4 cursor-pointer">
+            <div className="relative nav-dropdown py-4 cursor-pointer group">
               <div className="flex items-center gap-1.5 text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 <GlobeIcon /> {lang.toUpperCase()} <ChevronDown />
               </div>
-              <div className="dropdown-menu absolute hidden right-0 top-[60px] bg-[#052107]/95 backdrop-blur-xl border border-[#CAF5A6]/20 rounded-xl overflow-hidden min-w-[200px] shadow-2xl py-2">
+              
+              {/* Invisible bridge to prevent hover loss */}
+              <div className="absolute top-[100%] right-0 w-full h-[15px] hidden group-hover:block z-40" />
+              
+              <div className="dropdown-menu absolute hidden group-hover:block right-0 top-[calc(100%+8px)] bg-[#052107]/95 backdrop-blur-xl border border-[#CAF5A6]/20 rounded-xl overflow-hidden min-w-[200px] shadow-2xl py-2 z-50">
                 {[
                   { code: 'GB', name: 'English', sub: 'English', langCode: 'en' },
                   { code: 'CN', name: '中文', sub: 'Chinese', langCode: 'zh' },
@@ -198,91 +199,101 @@ export default function LandingPage() {
               </p>
             </div>
 
+            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
+              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>1</div>
+              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
+                {t(lang, 'lp_step1Title')}
+              </h3>
+              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                {t(lang, 'lp_step1Sub')}
+              </p>
+            </div>
+            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
+              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>2</div>
+              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
+                {t(lang, 'lp_step2Title')}
+              </h3>
+              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                {t(lang, 'lp_step2Sub')}
+              </p>
+            </div>
+            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
+              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>3</div>
+              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
+                {t(lang, 'lp_step3Title')}
+              </h3>
+              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                {t(lang, 'lp_step3Sub')}
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 3 - The Promise (Compact Grid, Zero Scroll Fatigue) */}
       <section id="the-promise" className="relative w-full bg-[#052107] pt-[80px] pb-[120px] px-[24px] z-10">
         <div className="relative max-w-[1200px] mx-auto z-10">
           <div className="text-center mb-[64px]">
             <h2 className="mb-[16px] text-[#CAF5A6] font-medium text-[12px] tracking-[0.1em] uppercase"
                 style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-              Built to empower. Never to extract.
+              {t(lang, 'lp_promiseTitle')}
             </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            
-            {/* The Tiebreaker / Equitable - Spans 8 columns */}
             <div className="md:col-span-8 bg-gradient-to-br from-[#CAF5A6]/15 to-[#37613A]/20 border border-[#CAF5A6]/30 rounded-[32px] p-8 md:p-12 flex flex-col justify-center relative overflow-hidden group">
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.03] scale-[2] group-hover:scale-[2.2] transition-transform duration-1000">
-                <div className="svg-white w-[400px] h-[400px] relative"><Image src="/assets/Lined Logo White.svg" alt="Logo" fill /></div>
-              </div>
-              <div className="bg-[#052107]/50 text-[#CAF5A6] text-[12px] font-medium px-4 py-2 rounded-full inline-flex self-start border border-[#CAF5A6]/20 mb-6 relative z-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                Equitable Standard
-              </div>
-              <h3 className="text-[#F5F5F0] text-[36px] mb-4 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Zero Extraction.</h3>
+              <h3 className="text-[#F5F5F0] text-[36px] mb-4 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseEquitable')}</h3>
               <p className="text-[16px] text-[#F5F5F0]/80 leading-[1.7] max-w-[500px] relative z-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                Your plan is yours. No data sold, no profile built, no ads. We collect nothing. We store nothing. We give you everything.
+                {t(lang, 'lp_promiseEquitableSub')}
               </p>
             </div>
 
-            {/* Universal - Spans 4 columns */}
             <div className="md:col-span-4 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Universal</h3>
+                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseUniversal')}</h3>
                 <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                  A rooftop garden in Bangkok or a rural plot in Belgium. The AI speaks your language and knows your 6 climate zones.
+                  {t(lang, 'lp_promiseUniversalSub')}
                 </p>
               </div>
             </div>
 
-            {/* Scalable - Spans 6 columns */}
             <div className="md:col-span-6 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>Stateless</h3>
+                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseStateless')}</h3>
                 <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                  No database. No bottleneck. Powered by Edge functions to scale to 10,000+ simultaneous users without a sweat.
+                  {t(lang, 'lp_promiseStatelessSub')}
                 </p>
               </div>
             </div>
 
-            {/* User Friendly - Spans 6 columns */}
             <div className="md:col-span-6 bg-[#CAF5A6] rounded-[32px] p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#052107] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>User Friendly</h3>
+                <h3 className="text-[#052107] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseFriendly')}</h3>
                 <p className="text-[14px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                  Five taps. That&apos;s it. A child and a grandparent can both use it with zero friction.
+                  {t(lang, 'lp_promiseFriendlySub')}
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* SECTION 4 - Final CTA (Premium Glow) */}
       <section className="relative w-full bg-[#031404] py-[100px] px-[24px] z-10 overflow-hidden">
         <GrainTexture />
         <div className="relative max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-12 z-10">
-          
-          {/* Left Side: Content */}
           <div className="flex-1 max-w-[480px]">
             <h2 className="text-[#F5F5F0] mb-6 leading-[1.1]" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(40px, 5vw, 56px)', fontWeight: 700 }}>
-              Ready to grow<br />right?
+              {t(lang, 'lp_ctaTitle1')}<br />{t(lang, 'lp_ctaTitle2')}
             </h2>
             <p className="text-[16px] text-[#F5F5F0]/70 leading-[1.7] mb-8" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-              Experience the magic of an AI-powered garden plan. Perfectly tailored to your climate, completely private, and absolutely free.
+              {t(lang, 'lp_ctaSub')}
             </p>
             <Link href="/garden" 
                   className="bg-[#FFFFFF] text-[#052107] text-[16px] rounded-full hover:scale-[1.03] transition-transform duration-200 ease-out inline-flex items-center justify-center"
                   style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700, padding: '0 40px', minHeight: '56px', boxShadow: '0 8px 32px rgba(255,255,255,0.15)' }}>
-              Get Started
+              {t(lang, 'getStarted')}
             </Link>
           </div>
 
-          {/* Right Side: Glowing Phone Mockup */}
           <div className="flex-1 relative flex justify-center items-center h-[460px] w-full">
             {/* The Glow Halo */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[400px] bg-gradient-to-tr from-[#CAF5A6] to-[#37613A] blur-[80px] opacity-[0.35] rounded-full mix-blend-screen"></div>
