@@ -57,7 +57,7 @@ export default function ResultsScreen() {
       }, 3000);
     }
     return () => clearTimeout(timer);
-  }, [loading]);
+  }, [loading, lang]);
 
   useEffect(() => {
     const fetchRecommendations = async () => {

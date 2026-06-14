@@ -8,7 +8,7 @@ import { t } from '@/lib/translations';
 
 export default function IntroScreen() {
   const router = useRouter();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
