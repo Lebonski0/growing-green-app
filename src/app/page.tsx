@@ -60,12 +60,12 @@ export default function LandingPage() {
             <div className="svg-white w-[28px] h-[28px] relative group-hover:scale-105 transition-transform">
               <Image src="/assets/Logo White.svg" alt="Green Garden Logo" fill className="object-contain" />
             </div>
-            <span className="text-[#F5F5F0] text-[20px] font-bold tracking-wide mt-1" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+            <span className="hidden sm:block text-[#F5F5F0] text-[20px] font-bold tracking-wide mt-1" style={{ fontFamily: 'var(--font-playfair), serif' }}>
               Green Garden
             </span>
           </Link>
           
-          <nav className="flex items-center gap-6 md:gap-10">
+          <nav className="flex items-center gap-4 md:gap-10">
             <a href="#the-magic" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>The Magic</a>
             <a href="#the-promise" className="hidden md:block text-[#F5F5F0]/70 hover:text-[#CAF5A6] text-[13px] font-medium transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>The Promise</a>
             
@@ -131,7 +131,7 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-[#F5F5F0] mb-6 leading-[1.05] drop-shadow-2xl" 
-              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(48px, 9vw, 84px)', fontWeight: 700 }}>
+              style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(40px, 11vw, 84px)', fontWeight: 700 }}>
             Your garden,<br />grown right.
           </h1>
           
@@ -157,19 +157,21 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECTION 2 - The Magic (Compact, Fix dark SVGs to white) */}
-      <section id="the-magic" className="relative w-full bg-[#052107] py-[80px] px-[24px] z-10 border-t border-[#CAF5A6]/5">
+      {/* SECTION 2 - The Magic */}
+      <section id="the-magic" className="relative w-full bg-[#052107] py-[64px] md:py-[80px] px-[24px] z-10 border-t border-[#CAF5A6]/5">
         <div className="max-w-[1000px] mx-auto">
-          <div className="flex flex-col md:flex-row gap-[40px] justify-between items-start">
+          <div className="flex flex-col md:flex-row gap-[56px] md:gap-[40px] justify-between items-center md:items-start">
             
             {/* Step 1 */}
             <div className="flex-1 flex flex-col items-center text-center">
               <div className="w-[64px] h-[64px] rounded-full bg-[#CAF5A6]/10 border border-[#CAF5A6]/20 flex items-center justify-center mb-5 relative">
                  <Image src="/assets/Map Icon.svg" alt="Map" width={24} height={24} className="svg-white opacity-90" />
               </div>
-              <h3 className="text-[#F5F5F0] text-[18px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>1. Tap your conditions</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                No typing required. Just visual choices about your climate and space.
+              <h2 className="text-[#F5F5F0] text-[20px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
+                {t(lang, 'lp_step1Title')}
+              </h2>
+              <p className="text-[15px] text-[#F5F5F0]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                {t(lang, 'lp_step1Sub')}
               </p>
             </div>
 
@@ -180,9 +182,11 @@ export default function LandingPage() {
               <div className="w-[64px] h-[64px] rounded-full bg-[#CAF5A6]/10 border border-[#CAF5A6]/20 flex items-center justify-center mb-5 relative">
                  <Image src="/assets/Sun.svg" alt="Sun" width={24} height={24} className="svg-white opacity-90" />
               </div>
-              <h3 className="text-[#F5F5F0] text-[18px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>2. AI crafts the plan</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                Our intelligence engine finds native plants that genuinely thrive in your exact spot.
+              <h2 className="text-[#F5F5F0] text-[20px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
+                {t(lang, 'lp_step2Title')}
+              </h2>
+              <p className="text-[15px] text-[#F5F5F0]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+                {t(lang, 'lp_step2Sub')}
               </p>
             </div>
 
@@ -193,36 +197,10 @@ export default function LandingPage() {
               <div className="w-[64px] h-[64px] rounded-full bg-[#CAF5A6]/10 border border-[#CAF5A6]/20 flex items-center justify-center mb-5 relative">
                  <Image src="/assets/Send.svg" alt="Send" width={24} height={24} className="svg-white opacity-90" />
               </div>
-              <h3 className="text-[#F5F5F0] text-[18px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>3. Delivered & Deleted</h3>
-              <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                Your plan lands in your inbox. The moment it sends, we delete everything.
-              </p>
-            </div>
-
-            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
-              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>1</div>
-              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
-                {t(lang, 'lp_step1Title')}
-              </h3>
-              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                {t(lang, 'lp_step1Sub')}
-              </p>
-            </div>
-            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
-              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>2</div>
-              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
-                {t(lang, 'lp_step2Title')}
-              </h3>
-              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-                {t(lang, 'lp_step2Sub')}
-              </p>
-            </div>
-            <div className="flex-1 min-w-[300px] bg-[#FFFFFF] rounded-[24px] p-8 md:p-10 flex flex-col items-center text-center shadow-sm">
-              <div className="w-[80px] h-[80px] bg-[#CAF5A6] text-[#052107] rounded-full flex items-center justify-center mb-8" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: '32px', fontWeight: 700 }}>3</div>
-              <h3 className="text-[#052107] text-[20px] mb-3" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif', fontWeight: 700 }}>
+              <h2 className="text-[#F5F5F0] text-[20px] mb-2" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>
                 {t(lang, 'lp_step3Title')}
-              </h3>
-              <p className="text-[15px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+              </h2>
+              <p className="text-[15px] text-[#F5F5F0]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 {t(lang, 'lp_step3Sub')}
               </p>
             </div>
@@ -240,34 +218,34 @@ export default function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <div className="md:col-span-8 bg-gradient-to-br from-[#CAF5A6]/15 to-[#37613A]/20 border border-[#CAF5A6]/30 rounded-[32px] p-8 md:p-12 flex flex-col justify-center relative overflow-hidden group">
-              <h3 className="text-[#F5F5F0] text-[36px] mb-4 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseEquitable')}</h3>
+            <div className="md:col-span-8 bg-gradient-to-br from-[#CAF5A6]/15 to-[#37613A]/20 border border-[#CAF5A6]/30 rounded-[24px] md:rounded-[32px] p-6 md:p-12 flex flex-col justify-center relative overflow-hidden group">
+              <h3 className="text-[#F5F5F0] text-[28px] md:text-[36px] mb-4 relative z-10" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseEquitable')}</h3>
               <p className="text-[16px] text-[#F5F5F0]/80 leading-[1.7] max-w-[500px] relative z-10" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                 {t(lang, 'lp_promiseEquitableSub')}
               </p>
             </div>
 
-            <div className="md:col-span-4 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
+            <div className="md:col-span-4 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseUniversal')}</h3>
+                <h3 className="text-[#F5F5F0] text-[22px] md:text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseUniversal')}</h3>
                 <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                   {t(lang, 'lp_promiseUniversalSub')}
                 </p>
               </div>
             </div>
 
-            <div className="md:col-span-6 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[32px] p-8 flex flex-col justify-between">
+            <div className="md:col-span-6 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#F5F5F0] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseStateless')}</h3>
+                <h3 className="text-[#F5F5F0] text-[22px] md:text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseStateless')}</h3>
                 <p className="text-[14px] text-[#F5F5F0]/60 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                   {t(lang, 'lp_promiseStatelessSub')}
                 </p>
               </div>
             </div>
 
-            <div className="md:col-span-6 bg-[#CAF5A6] rounded-[32px] p-8 flex flex-col justify-between">
+            <div className="md:col-span-6 bg-[#CAF5A6] rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between">
               <div>
-                <h3 className="text-[#052107] text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseFriendly')}</h3>
+                <h3 className="text-[#052107] text-[22px] md:text-[24px] mb-3" style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}>{t(lang, 'lp_promiseFriendly')}</h3>
                 <p className="text-[14px] text-[#052107]/70 leading-[1.6]" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
                   {t(lang, 'lp_promiseFriendlySub')}
                 </p>
@@ -277,11 +255,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative w-full bg-[#031404] py-[100px] px-[24px] z-10 overflow-hidden">
+      <section className="relative w-full bg-[#031404] py-[80px] md:py-[100px] px-[24px] z-10 overflow-hidden">
         <GrainTexture />
         <div className="relative max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-12 z-10">
-          <div className="flex-1 max-w-[480px]">
-            <h2 className="text-[#F5F5F0] mb-6 leading-[1.1]" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(40px, 5vw, 56px)', fontWeight: 700 }}>
+          <div className="flex-1 max-w-[480px] text-center md:text-left">
+            <h2 className="text-[#F5F5F0] mb-6 leading-[1.1]" style={{ fontFamily: 'var(--font-playfair), serif', fontSize: 'clamp(36px, 10vw, 56px)', fontWeight: 700 }}>
               {t(lang, 'lp_ctaTitle1')}<br />{t(lang, 'lp_ctaTitle2')}
             </h2>
             <p className="text-[16px] text-[#F5F5F0]/70 leading-[1.7] mb-8" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
@@ -294,12 +272,12 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="flex-1 relative flex justify-center items-center h-[460px] w-full">
+          <div className="flex-1 relative flex justify-center items-center h-[400px] md:h-[460px] w-full mt-8 md:mt-0">
             {/* The Glow Halo */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[400px] bg-gradient-to-tr from-[#CAF5A6] to-[#37613A] blur-[80px] opacity-[0.35] rounded-full mix-blend-screen"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] md:w-[280px] h-[320px] md:h-[400px] bg-gradient-to-tr from-[#CAF5A6] to-[#37613A] blur-[60px] md:blur-[80px] opacity-[0.35] rounded-full mix-blend-screen"></div>
             
             {/* The Phone */}
-            <div className="relative z-10 w-[230px] h-[460px] animate-float">
+            <div className="relative z-10 w-[200px] md:w-[230px] h-[400px] md:h-[460px] animate-float">
               <Image src="/assets/phone-mockup.png" alt="App Preview" fill className="object-contain drop-shadow-2xl" />
             </div>
           </div>
@@ -312,7 +290,7 @@ export default function LandingPage() {
         <p className="text-[14px] text-[#CAF5A6]/60" style={{ fontFamily: 'var(--font-playfair), serif', fontStyle: 'italic' }}>
           &quot;Think globally, build locally.&quot;
         </p>
-        <p className="text-[12px] text-[#F5F5F0]/40" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+        <p className="text-[12px] text-[#F5F5F0]/70" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
           © 2026 Green Garden · Hopamine Green Hackathon
         </p>
       </footer>
