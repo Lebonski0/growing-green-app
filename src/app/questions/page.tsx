@@ -4,6 +4,32 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+const getOptionImage = (label: string) => {
+  const map: Record<string, string> = {
+    'Food Forest': '/images/screens/foodforest.jpg',
+    'Pollinator Garden': '/images/screens/Pollinator Garden.jpg',
+    'Vegetable Plot': '/images/screens/Vegetable Plot.jpg',
+    'Lawn Replacement': '/images/screens/Lawn Replacemen.jpg',
+    'Tropical': '/images/screens/Tropical.jpg',
+    'Arid / Desert': '/images/screens/Arid.Desert.jpg',
+    'Mediterranean': '/images/screens/Mediterranean.jpg',
+    'Temperate': '/images/screens/Temperate.jpg',
+    'Continental': '/images/screens/Continental.jpg',
+    'Subtropical': '/images/screens/Subtropical.jpg',
+    'Full Sun (6+ hours)': '/images/screens/Full Sun.jpg',
+    'Partial Sun (3–6 hours)': '/images/screens/Partial sun.jpg',
+    'Partial Shade (1–3 hours)': '/images/screens/Partial shade.jpg',
+    'Full Shade (less than 1 hour)': '/images/screens/Full Shade.jpg',
+    'Tiny – Balcony / Container': '/images/screens/Tiny.jpg',
+    'Small – Up to 25m²': '/images/screens/Small.jpg',
+    'Medium – 25 to 100m²': '/images/screens/Meduim.jpg',
+    'Large – 100m² and above': '/images/screens/Large.jpg',
+    'Yes – I have test results': '/images/screens/soiltest yes.jpg',
+    'No – Use regional defaults': '/images/screens/Soil test no.jpg',
+  };
+  return map[label] || '';
+};
+
 const QUESTIONS = [
   {
     id: 'gardenType',
@@ -185,22 +211,22 @@ export default function QuestionsScreen() {
                     boxShadow: selected ? '0 2px 12px rgba(55,97,58,0.15)' : '0 1px 4px rgba(0,0,0,0.06)',
                   }}
                 >
-                  {/* 16:9 image placeholder */}
+                  {/* Option image */}
                   <div style={{
                     width: '100%',
                     aspectRatio: '16/9',
                     background: 'rgba(211,222,213,0.55)',
                     borderRadius: '10px',
                     marginBottom: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    position: 'relative'
                   }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ opacity: 0.3 }}>
-                      <rect x="3" y="3" width="18" height="18" rx="2" stroke="#052107" strokeWidth="1.5"/>
-                      <circle cx="8.5" cy="8.5" r="1.5" stroke="#052107" strokeWidth="1.5"/>
-                      <path d="M3 15L8 10L12 14L15 11L21 17" stroke="#052107" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <Image 
+                      src={getOptionImage(opt)} 
+                      alt={opt} 
+                      fill 
+                      style={{ objectFit: 'cover' }} 
+                    />
                   </div>
                   {/* Label */}
                   <span style={{
