@@ -90,14 +90,19 @@ export default function ResultsScreen() {
           body: JSON.stringify({ ...answers, lang }),
         });
         
-        if (!res.ok) throw new Error('Failed to fetch recommendations');
-        
         const result = await res.json();
+        
+        if (!res.ok) {
+          // Show the REAL error message from the API so we can diagnose
+          throw new Error(result?.error || `Server error ${res.status}`);
+        }
+        
         setData(result);
         sessionStorage.setItem('greenGardenResults', JSON.stringify(result));
       } catch (err) {
         console.error(err);
-        setError('Could not load recommendations. Please try again.');
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        setError(msg);
       } finally {
         setLoading(false);
       }
