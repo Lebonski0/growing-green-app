@@ -290,9 +290,14 @@ export default function LandingPage() {
         <p className="text-[14px] text-[#CAF5A6]/60" style={{ fontFamily: 'var(--font-playfair), serif', fontStyle: 'italic' }}>
           &quot;Think globally, build locally.&quot;
         </p>
-        <p className="text-[12px] text-[#F5F5F0]/70" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
-          © 2026 Green Garden · Hopamine Green Hackathon
-        </p>
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+          <Link href="/founders" className="text-[13px] text-[#F5F5F0]/80 hover:text-[#CAF5A6] transition-colors" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+            {t(lang, 'foundersTitle')}
+          </Link>
+          <p className="text-[12px] text-[#F5F5F0]/50" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+            © 2026 Green Garden · Hopamine Green Hackathon
+          </p>
+        </div>
       </footer>
     </>
   );
